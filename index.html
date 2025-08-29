@@ -41,4 +41,46 @@
     moveShooter()
 
 </script>
+
+<script>
+    myShip = document.getElementById("myShip")
+    let movingRight = false;
+    let movingLeft = false;
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") {
+            movingLeft = true;
+        } else if (event.key === "ArrowRight") {
+            movingRight = true;
+        }
+    })
+
+    document.addEventListener("keyup", (event) => {
+        if (event.key === "ArrowLeft") {
+            movingLeft = false;
+        } else if (event.key === "ArrowRight") {
+            movingRight = false;
+        }
+    })
+
+    const myShipWidth = myShip.offsetWidth;
+    const gameWidth = document.getElementById("game").offsetWidth;
+
+    let startPosition = 0 + gameWidth / 2;
+    let leftMostPosition = 0 + myShipWidth/2;
+
+    function moveShip() {
+        let left = parseInt(myShip.style.left || startPosition,10)
+        if (movingLeft) {
+            left -= 4;
+        } else if (movingRight) {
+            left += 4;
+       
+        }
+        left = Math.max(leftMostPosition, Math.min(left, gameWidth - myShipWidth / 2))
+        myShip.style.left = left + 'px';
+        requestAnimationFrame(moveShip);
+    }
+    moveShip()
+</script>
 </html>
