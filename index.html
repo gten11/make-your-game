@@ -14,8 +14,31 @@
         <img id ="asteroid4" src="images/asteroid4.png">
         <img id="myShip" src="images/myShip.png">
         <img id="myShooter" src="images/myShooter.png">
+        <img id ="bulletMine" src="images/bulletMine.png">
+        <img id ="bullet" src="images/bullet.png">
 
     </div>
     
 </body>
+
+<script>
+    const myShooter = document.getElementById("myShooter")
+    
+
+    let left = 0;
+    let direction = 1;
+    function moveShooter() {
+        const gameWidth = document.getElementById("game").offsetWidth;
+        const shooterWidth = document.getElementById("myShooter").offsetWidth;
+        left += direction * 2;
+        if (left + shooterWidth >= gameWidth || left <= 0) {
+            direction *= (-1);
+        }
+        myShooter.style.left = left + 'px'
+        requestAnimationFrame(moveShooter)
+    }
+
+    moveShooter()
+
+</script>
 </html>

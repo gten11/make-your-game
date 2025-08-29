@@ -17,9 +17,23 @@
 }
 
 #myShooter {
-    width: 5vw;
+    width: 4vw;
     bottom: 19vh;
-    left: 0%;
+    left: 0;
+    position: absolute;
+}
+
+#bulletMine {
+    width: 1vw;
+    bottom: 30vh;
+    left: 50%;
+    position: absolute;
+}
+
+#bullet {
+    width: 1vw;
+    top: 1vh;
+    left: 4%;
     position: absolute;
 }
 
