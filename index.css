@@ -1,0 +1,53 @@
+#game {
+    margin :auto;
+    width: 90vw;
+    height: 90vh;
+    border: 2px solid magenta;
+    position: relative;
+    color: lightgrey;
+    margin-top: 30vh;
+}
+
+#myShip {
+    width: 10vw;
+    bottom: 0.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+}
+
+#myShooter {
+    width: 5vw;
+    bottom: 19vh;
+    left: 0%;
+    position: absolute;
+}
+
+
+#asteroid1 {
+    width: 10vw;
+    bottom: 30vh;
+    left: 4%;
+    position: absolute;
+}
+
+#asteroid2 {
+    width: 10vw;
+    bottom: 30vh;
+    left: 30%;
+    position: absolute;
+}
+
+#asteroid3 {
+    width: 10vw;
+    bottom: 30vh;
+    left: 60%;
+    position: absolute;
+}
+
+#asteroid4 {
+    width: 10vw;
+    bottom: 30vh;
+    right: 5%;
+    position: absolute;
+}
