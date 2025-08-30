@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <h1>"Space Invaders"</h1>
+    <div id="gameName">Space Invaders</div>
     <div id ="game">
         <img id ="asteroid1" src="images/asteroid1.png">
         <img id ="asteroid2" src="images/asteroid2.png">
@@ -22,7 +22,21 @@
 </body>
 
 <script>
-    let stopGame = false
+
+    function startGame() {
+        const gameName = document.getElementById("gameName")
+        gameName.style.animation = "fadeOut 3s forwards"
+    }
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === " ") {
+            startGame()
+        }
+    })
+</script>
+
+<script>
+    let stopGame = true
     const game = document.getElementById("game")
     const myShooter = document.getElementById("myShooter")
     const asteroid1 = document.getElementById("asteroid1")
