@@ -22,6 +22,7 @@
 </body>
 
 <script>
+    let stopGame = false
     const game = document.getElementById("game")
     const myShooter = document.getElementById("myShooter")
     const asteroid1 = document.getElementById("asteroid1")
@@ -47,6 +48,7 @@
     let left = 0;
     let countBullet = 0;
     let direction = 1;
+    
     function moveShooter() {
         const gameWidth = document.getElementById("game").offsetWidth;
         const shooterWidth = document.getElementById("myShooter").offsetWidth;
@@ -92,6 +94,9 @@
     }
 
     function gameLoop() {
+        if (stopGame) {
+            return
+        }
         moveShooter()
         if (left % 15 === 0 && !((left > asteroid1Left && left < asteroid1Right) || (left > asteroid2Left && left < asteroid2Right) || (left > asteroid3Left && left < asteroid3Right) || (left > asteroid4Left && left < asteroid4Right)) ) {
         myBullets()
@@ -100,8 +105,17 @@
         requestAnimationFrame(gameLoop)
     }
 
-   gameLoop()
-
+    document.addEventListener("keydown", (event) => {
+        if (event.key === " ") {
+            stopGame = !stopGame;
+            if (!stopGame) {
+            gameLoop()
+        }
+        }
+    })
+    
+    gameLoop()
+  
 </script>
 
 <script>
@@ -143,6 +157,9 @@
         myShip.style.left = left + 'px';
         requestAnimationFrame(moveShip);
     }
+
     moveShip()
+   
 </script>
+
 </html>
