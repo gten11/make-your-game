@@ -18,6 +18,15 @@
     color: magenta;
 }
 
+#instructionStart {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: rgb(37, 25, 72);
+}
+
 @keyframes fadeOut {
     0% {
         opacity: 1;

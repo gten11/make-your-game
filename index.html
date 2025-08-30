@@ -9,6 +9,7 @@
 
 <body>
     <div id="gameName">Space Invaders</div>
+    <div id="instructionStart">Press "space bar" to start</div>
     <div id ="game">
         <img id ="asteroid1" src="images/asteroid1.png">
         <img id ="asteroid2" src="images/asteroid2.png">
@@ -25,7 +26,9 @@
 
     function startGame() {
         const gameName = document.getElementById("gameName")
+        const instr = document.getElementById("instructionStart")
         gameName.style.animation = "fadeOut 3s forwards"
+        instr.style.animation = "fadeOut 3s forwards"
     }
 
     document.addEventListener("keydown", (event) => {
