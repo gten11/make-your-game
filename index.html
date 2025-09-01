@@ -87,12 +87,23 @@
     const shooterWidth = document.getElementById("myShooter").offsetWidth;
     
     function moveShooter() {
-        
+        let myShooterRect = myShooter.getBoundingClientRect()
+        let myShipRect = myShip.getBoundingClientRect()
+        if (!(myShooterRect.left <= myShipRect.right && myShooterRect.right >= myShipRect.left)) {
         left += direction * 2;
         if (left + shooterWidth >= gameWidth || left <= 0) {
             direction *= (-1);
         }
         myShooter.style.left = left + 'px'
+    
+        } else {
+            direction *= (-1);
+            left += direction * 2;
+        if (left + shooterWidth >= gameWidth || left <= 0) {
+            direction *= (-1);
+        }
+        myShooter.style.left = left + 'px'
+        }
     }
 
     function myBullets() {
