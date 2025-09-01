@@ -48,6 +48,7 @@
     const asteroid4 = document.getElementById("asteroid4")
     const gameWhere = game.getBoundingClientRect()
     const gameLeft = gameWhere.left
+    const gameHeight = gameWhere.height
     const asteroidWhere1 = asteroid1.getBoundingClientRect()
     const asteroidWhere2 = asteroid2.getBoundingClientRect()
     const asteroidWhere3 = asteroid3.getBoundingClientRect()
@@ -93,8 +94,6 @@
     function moveBullets() {
         for (bullet of bullets) {
             let bottomStr = bullet.style.bottom
-            console.log("bottomstr", bottomStr)
-            console.log("bottom", bottomStr.slice(0, -2))
             if (bottomStr.endsWith("vh")) {
             bottomStr = bullet.style.bottom.slice(0,-2)
             } else {
@@ -102,7 +101,7 @@
             }
             let bottom = parseFloat(bottomStr, 10)
             bottom += 2
-            if (bottom >= 88) {
+            if (bottom >= 88) {//here need to convert to vh or px to be determined
                 bullet.remove()
             } else {
             bullet.style.bottom = bottom + 'vh';
@@ -177,6 +176,88 @@
 
     moveShip()
    
+</script>
+
+<script>
+    const myShip = document.getElementById("myShip")
+    let shipPrevPostion = myShip.getBoundingClientRect().left
+    const shipBulletWidth = 0.99933
+    let shipBullets = []
+    let animating = false
+
+    function vwToPx(vw) {
+        return (vw / 100) * window.innerWidth;
+    }
+
+    function pxToVw(px) {
+        return (px / window.innerWidth) * 100;
+    }
+
+    function pxToVh(px) {
+        return (px / window.innerHeight) * 100;
+    }
+
+    function vhToPx(vh) {
+        return (vh / 100) * window.innerHeight;
+    }
+
+    var intervalId;
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "s") {
+            if (!intervalId) {
+            createBullets()
+            intervalId = setInterval(createBullets, 200)
+            }
+            if (!animating) {
+            shootBullet()
+            animating = true
+            }
+        } 
+    })
+
+    document.addEventListener("keyup", (event) => {
+        if (event.key === "s") {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+    })
+
+    function createBullets() {
+        let shipRect = myShip.getBoundingClientRect();
+        let shipLeft = shipRect.left;
+        let shipRight = shipRect.right;
+        let shipHeight = shipRect.height;
+        const bulletStart = shipLeft + shipRect.width/2 - gameLeft - vwToPx(shipBulletWidth)/2;
+        const shipBullet = document.createElement("img")
+        shipBullet.src = "images/fire.png"
+        shipBullet.style.width = "1vw";
+        const bottomBullet = 0.5 + pxToVh(shipHeight); 
+        shipBullet.style.bottom = bottomBullet + "vh";
+        shipBullet.style.position = "absolute";
+        shipBullet.style.left = bulletStart + "px";
+        shipBullets.push(shipBullet)
+        game.appendChild(shipBullet)
+    }
+    
+    function shootBullet() {
+       
+        for (bullet of shipBullets) {
+            let bulletRect = bullet.getBoundingClientRect()
+            let bulletHeight = bulletRect.height
+            let bulletBottomstr = bullet.style.bottom.slice(0,-2)
+            let bulletBottomNum = vhToPx(parseFloat(bulletBottomstr, 10))
+            if (bulletBottomNum + bulletHeight + 5 < gameHeight) {
+                bulletBottomNum += 5;
+                bullet.style.bottom = pxToVh(bulletBottomNum) + "vh";
+            } else {
+                bullet.remove()
+                shipBullets = shipBullets.slice(1)
+            }
+        }
+        requestAnimationFrame(shootBullet)
+    }
+    
 </script>
 
 </html>
