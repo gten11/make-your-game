@@ -223,6 +223,8 @@
         }
     })
 
+    //if left is below the asteroid, then the bullet needs to be removed when it reaches the asteroid bottom and height
+
     function createBullets() {
         let shipRect = myShip.getBoundingClientRect();
         let shipLeft = shipRect.left;
@@ -247,12 +249,23 @@
             let bulletHeight = bulletRect.height
             let bulletBottomstr = bullet.style.bottom.slice(0,-2)
             let bulletBottomNum = vhToPx(parseFloat(bulletBottomstr, 10))
-            if (bulletBottomNum + bulletHeight + 5 < gameHeight) {
-                bulletBottomNum += 5;
-                bullet.style.bottom = pxToVh(bulletBottomNum) + "vh";
+            let bulletLeft = bulletRect.left + vwToPx(1)/2 - gameLeft
+            if (!(bulletLeft > asteroid1Left && bulletLeft < asteroid1Right) && !(bulletLeft > asteroid2Left && bulletLeft < asteroid2Right) && !(bulletLeft > asteroid3Left && bulletLeft < asteroid3Right) && !(bulletLeft > asteroid4Left && bulletLeft < asteroid4Right)) {
+                if (bulletBottomNum + bulletHeight + 5 < gameHeight) {
+                    bulletBottomNum += 10;
+                    bullet.style.bottom = pxToVh(bulletBottomNum) + "vh";
+                } else {
+                    shipBullets = shipBullets.filter(b => b !== bullet)
+                    bullet.remove()
+                }
             } else {
-                bullet.remove()
-                shipBullets = shipBullets.slice(1)
+                  if (bulletBottomNum + bulletHeight + 5 < vhToPx(30)) {
+                    bulletBottomNum += 10;
+                    bullet.style.bottom = pxToVh(bulletBottomNum) + "vh";
+                } else {
+                    bullet.remove()
+                    shipBullets = shipBullets.filter(b => b !== bullet)
+                }
             }
         }
         requestAnimationFrame(shootBullet)
