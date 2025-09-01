@@ -48,14 +48,14 @@
 }
 
 #myShooter {
-    width: 3vw;
+    width: 2vw;
     bottom: 19vh;
     left: 0;
     position: absolute;
 }
 
 #bulletMine {
-    width: 1vw;
+    width: 0.5vw;
     bottom: 30vh;
     left: 50%;
     position: absolute;

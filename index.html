@@ -203,7 +203,7 @@
 <script>
     const myShip = document.getElementById("myShip")
     let shipPrevPostion = myShip.getBoundingClientRect().left
-    const shipBulletWidth = 0.99933
+    const shipBulletWidth = 0.5
     let shipBullets = []
     let animating = false
     var intervalId;
@@ -238,14 +238,14 @@
         const bulletStart = shipLeft + shipRect.width/2 - gameLeft - vwToPx(shipBulletWidth)/2;
         const shipBullet = document.createElement("img")
         shipBullet.src = "images/fire.png"
-        shipBullet.style.width = "1vw";
+        shipBullet.style.width = "0.5vw";
         const bottomBullet = 0.5 + pxToVh(shipHeight); 
         shipBullet.style.bottom = bottomBullet + "vh";
         shipBullet.style.position = "absolute";
         shipBullet.style.left = bulletStart + "px";
         shipBullets.push(shipBullet)
         game.appendChild(shipBullet)
-    }
+    }                       
     
     function shootBullet() {
        
