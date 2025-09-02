@@ -28,7 +28,6 @@
     const gameWidth = document.getElementById("game").offsetWidth;
     const myShip = document.getElementById("myShip")
     let collisionShown = false
-    let collisionActive = false
     let shipMoving = false
 
     function startGame() {
@@ -65,6 +64,7 @@
     let left = 0;
     let countBullet = 0;
     let direction = 1;
+    let shooterCollisionCooldown = false
     const shooterWidth = document.getElementById("myShooter").offsetWidth;
     
     function moveShooter() {
@@ -72,6 +72,10 @@
         let myShipRect = myShip.getBoundingClientRect()
         if (!(myShooterRect.left <= myShipRect.right && myShooterRect.right >= myShipRect.left) || ((myShooterRect.left <= myShipRect.right && myShooterRect.right >= myShipRect.left) && !shipMoving)) {
         left += direction * 2;
+        shooterCollisionCooldown = true
+            setTimeout(() => {
+                shooterCollisionCooldown = false
+            }, 400)
         if (left + shooterWidth >= gameWidth || left <= 0) {
             direction *= (-1);
         }
@@ -150,11 +154,12 @@
     let movingLeft = false;
 
     document.addEventListener("keydown", (event) => {
-        shipMoving = true
-        if (event.key === "ArrowLeft") {
+        if (!collisionShown && event.key === "ArrowLeft") {
             movingLeft = true;
-        } else if (event.key === "ArrowRight") {
+            shipMoving = true;
+        } else if (!collisionShown && event.key === "ArrowRight") {
             movingRight = true;
+            shipMoving = true;
         }
     })
 
@@ -179,7 +184,7 @@
         let buffer = myShipWidth/2 - 5
         console.log("buffer", buffer)
         let isOverlapping = !(myShooterRect.left - buffer >= myShipRect.right || myShooterRect.right <= myShipRect.left - buffer);
-        if (isOverlapping && !collisionShown && !collisionActive && shipMoving) {
+        if (isOverlapping && !collisionShown && shipMoving) {
             let alertCollision =  document.createElement("div")
             alertCollision.textContent = "⚠ Collision imminent!"
             alertCollision.style.position = "absolute"
@@ -190,13 +195,9 @@
             alertCollision.style.size = "10rem";
             game.appendChild(alertCollision)
             collisionShown = true
-            collisionActive = true
             setTimeout(() => {
                 alertCollision.remove()
                 collisionShown = false;
-                setTimeout(() => {
-                    collisionActive = false 
-                }, 800)
             }, 1000)
         }
         if (!collisionShown) {
@@ -241,6 +242,7 @@
     })
 
     function createBullets() {
+        if (!collisionShown) {
         let shipRect = myShip.getBoundingClientRect();
         let shipLeft = shipRect.left;
         let shipRight = shipRect.right;
@@ -255,6 +257,7 @@
         shipBullet.style.left = bulletStart + "px";
         shipBullets.push(shipBullet)
         game.appendChild(shipBullet)
+        }
     }                       
     
     function shootBullet() {
