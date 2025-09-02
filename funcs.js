@@ -29,6 +29,19 @@
     const myShip = document.getElementById("myShip")
     let collisionShown = false
     let shipMoving = false
+    let shooterRemoved = false
+
+        //obj1 must be smaller than obj2
+    function isOverlapping(obj1, obj2) {
+        obj1Rect = obj1.getBoundingClientRect()
+        obj2Rect = obj2.getBoundingClientRect()
+
+        if (obj1Rect.right < obj2Rect.right &&  obj1Rect.left > obj2Rect.left && obj1Rect.top >= obj2Rect.top && obj1Rect.bottom <= obj2Rect.bottom) {
+            return true
+        }
+        return false
+    }
+
 
     function startGame() {
         const gameName = document.getElementById("gameName")
@@ -95,7 +108,7 @@
         countBullet++
         let name = "myBullet" + countBullet;
         const myBullet = document.createElement("img")
-        const shooterHeight = document.getElementById("myShooter").offsetHeight;
+        const shooterHeight = document.getElementById("myShooter")?.offsetHeight || 50;
         myBullet.id = name
         myBullet.src = "images/bulletMine.png"
         myBullet.style.width = "0.5vw";
@@ -106,6 +119,8 @@
         game.appendChild(myBullet);
         bullets.push(myBullet)
     }
+
+    //I need to make an explosion if my bullets get into an object. 
 
     function moveBullets() {
         for (let bullet of bullets) {
@@ -129,14 +144,17 @@
         if (stopGame) {
             return
         }
+        if (!shooterRemoved) {
         moveShooter()
         const bulletWidth = vwToPx(0.5)
         let bulletLeft = left + shooterWidth/2 - bulletWidth/2
         if (left % 15 === 0 && !((bulletLeft + bulletWidth/2> asteroid1Left && bulletLeft + bulletWidth/2 < asteroid1Right) || (bulletLeft + bulletWidth/2 > asteroid2Left && bulletLeft + bulletWidth/2 < asteroid2Right) || (bulletLeft + bulletWidth/2 > asteroid3Left && bulletLeft + bulletWidth/2 < asteroid3Right) || (bulletLeft + bulletWidth/2> asteroid4Left && bulletLeft + bulletWidth/2 < asteroid4Right)) ) {
             myBullets()
         }
+        }
         moveBullets()
         requestAnimationFrame(gameLoop)
+        
     }
 
     document.addEventListener("keydown", (event) => {
@@ -182,7 +200,6 @@
         let myShooterRect = myShooter.getBoundingClientRect()
         let myShipRect = myShip.getBoundingClientRect()
         let buffer = myShipWidth/2 - 5
-        console.log("buffer", buffer)
         let isOverlapping = !(myShooterRect.left - buffer >= myShipRect.right || myShooterRect.right <= myShipRect.left - buffer);
         if (isOverlapping && !collisionShown && shipMoving) {
             let alertCollision =  document.createElement("div")
@@ -268,7 +285,19 @@
             let bulletBottomstr = bullet.style.bottom.slice(0,-2)
             let bulletBottomNum = vhToPx(parseFloat(bulletBottomstr, 10))
             let bulletLeft = bulletRect.left + vwToPx(1)/2 - gameLeft
-            if (!(bulletLeft > asteroid1Left && bulletLeft < asteroid1Right) && !(bulletLeft > asteroid2Left && bulletLeft < asteroid2Right) && !(bulletLeft > asteroid3Left && bulletLeft < asteroid3Right) && !(bulletLeft > asteroid4Left && bulletLeft < asteroid4Right)) {
+            if (isOverlapping(bullet, myShooter)) {
+                let myShooterLocation = myShooter.getBoundingClientRect()
+                shooterRemoved = true
+                myShooter.remove()
+                let expl = document.createElement("img")
+                expl.src = "images/explosion.png"
+                expl.style.position = "absolute";
+                expl.style.bottom = "19vh";
+                expl.style.width = "5vw";
+                expl.style.left = myShooterLocation.left -gameLeft + "px";
+                expl.style.animation = "fadeOut 3s forwards"
+                game.appendChild(expl)
+            } else if (!(bulletLeft > asteroid1Left && bulletLeft < asteroid1Right) && !(bulletLeft > asteroid2Left && bulletLeft < asteroid2Right) && !(bulletLeft > asteroid3Left && bulletLeft < asteroid3Right) && !(bulletLeft > asteroid4Left && bulletLeft < asteroid4Right)) {
                 if (bulletBottomNum + bulletHeight + 5 < gameHeight) {
                     bulletBottomNum += 10;
                     bullet.style.bottom = pxToVh(bulletBottomNum) + "vh";
