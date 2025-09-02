@@ -4,32 +4,33 @@
 
 
     let stopGame = true
-    const game = document.getElementById("game")
-    const myShooter = document.getElementById("myShooter")
-    const asteroid1 = document.getElementById("asteroid1")
-    const asteroid2 = document.getElementById("asteroid2")
-    const asteroid3= document.getElementById("asteroid3")
-    const asteroid4 = document.getElementById("asteroid4")
-    const gameWhere = game.getBoundingClientRect()
-    const gameLeft = gameWhere.left
-    const gameHeight = gameWhere.height
-    const asteroidWhere1 = asteroid1.getBoundingClientRect()
-    const asteroidWhere2 = asteroid2.getBoundingClientRect()
-    const asteroidWhere3 = asteroid3.getBoundingClientRect()
-    const asteroidWhere4 = asteroid4.getBoundingClientRect()
-    const asteroid1Left = asteroidWhere1.left - gameLeft
-    const asteroid1Right = asteroidWhere1.right - gameLeft
-    const asteroid2Left = asteroidWhere2.left - gameLeft
-    const asteroid2Right = asteroidWhere2.right - gameLeft
-    const asteroid3Left = asteroidWhere3.left - gameLeft
-    const asteroid3Right = asteroidWhere3.right - gameLeft
-    const asteroid4Left = asteroidWhere4.left - gameLeft
-    const asteroid4Right = asteroidWhere4.right - gameLeft
-    const gameWidth = document.getElementById("game").offsetWidth;
+    let game = document.getElementById("game")
+    let myShooter = document.getElementById("myShooter")
+    let asteroid1 = document.getElementById("asteroid1")
+    let asteroid2 = document.getElementById("asteroid2")
+    let asteroid3= document.getElementById("asteroid3")
+    let asteroid4 = document.getElementById("asteroid4")
+    let gameWhere = game.getBoundingClientRect()
+    let gameLeft = gameWhere.left
+    let gameHeight = gameWhere.height
+    let asteroidWhere1 = asteroid1.getBoundingClientRect()
+    let asteroidWhere2 = asteroid2.getBoundingClientRect()
+    let asteroidWhere3 = asteroid3.getBoundingClientRect()
+    let asteroidWhere4 = asteroid4.getBoundingClientRect()
+    let asteroid1Left = asteroidWhere1.left - gameLeft
+    let asteroid1Right = asteroidWhere1.right - gameLeft
+    let asteroid2Left = asteroidWhere2.left - gameLeft
+    let asteroid2Right = asteroidWhere2.right - gameLeft
+    let asteroid3Left = asteroidWhere3.left - gameLeft
+    let asteroid3Right = asteroidWhere3.right - gameLeft
+    let asteroid4Left = asteroidWhere4.left - gameLeft
+    let asteroid4Right = asteroidWhere4.right - gameLeft
+    let gameWidth = document.getElementById("game").offsetWidth;
     const myShip = document.getElementById("myShip")
     let collisionShown = false
     let shipMoving = false
     let shooterRemoved = false
+    let gameStarted = false
 
         //obj1 must be smaller than obj2
     function isOverlapping(obj1, obj2) {
@@ -53,6 +54,7 @@
     document.addEventListener("keydown", (event) => {
         if (event.key === " ") {
             startGame()
+            gameStarted = true
         }
     })
 
@@ -72,7 +74,31 @@
         return (vh / 100) * window.innerHeight;
     }
 
-   
+    let aliens1 = []
+    let countAlien1 = 7
+    let totalAliens1 = 0
+    // let aliens2 = []
+    // let aliens3 = []
+    // let aliens4 = []
+
+   const alien1Interval = setInterval(() => {
+        if (gameStarted && countAlien1 > totalAliens1) {
+        let alien1 = document.createElement("img")
+        alien1.src = "images/ship1.png"
+        alien1.style.position = "absolute"
+        alien1.style.width = "3vw"
+        alien1.style.left = (totalAliens1 * 5) + "vw"
+        alien1.style.bottom = "50vh"
+        game.appendChild(alien1)
+        aliens1.push(alien1)
+        totalAliens1++
+        } else {
+        clearInterval(alien1Interval)
+        }
+    }, 1000)
+    
+    
+    
     let bullets = []
     let left = 0;
     let countBullet = 0;
