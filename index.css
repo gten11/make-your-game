@@ -55,16 +55,11 @@
 }
 
 #bulletMine {
-    width: 0.5vw;
-    bottom: 30vh;
-    left: 50%;
     position: absolute;
 }
 
 #bullet {
     width: 1vw;
-    top: 1vh;
-    left: 4%;
     position: absolute;
 }
 

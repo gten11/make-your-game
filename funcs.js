@@ -27,6 +27,7 @@
     let asteroid4Right = asteroidWhere4.right - gameLeft
     let gameWidth = document.getElementById("game").offsetWidth;
     const myShip = document.getElementById("myShip")
+    let shooterHeight = document.getElementById("myShooter")?.offsetHeight || 26;
     let collisionShown = false
     let shipMoving = false
     let shooterRemoved = false
@@ -97,14 +98,14 @@
         }
     }, 1000)
     
-    
-    
+
     let bullets = []
     let left = 0;
     let countBullet = 0;
     let direction = 1;
     let shooterCollisionCooldown = false
-    const shooterWidth = document.getElementById("myShooter").offsetWidth;
+    let shooterWidth = document.getElementById("myShooter").offsetWidth;
+    let bottom = 0;
     
     function moveShooter() {
         let myShooterRect = myShooter.getBoundingClientRect()
@@ -118,7 +119,8 @@
         if (left + shooterWidth >= gameWidth || left <= 0) {
             direction *= (-1);
         }
-        myShooter.style.left = left + 'px'
+        myShooter.style.transform = `translateX(${left}px)`;
+        // myShooter.style.left = left + 'px' changed to transform to lesses paint
     
         } else if (shipMoving) {
             direction *= (-1);
@@ -126,7 +128,8 @@
         if (left + shooterWidth >= gameWidth || left <= 0) {
             direction *= (-1);
         }
-        myShooter.style.left = left + 'px'
+        myShooter.style.transform = `translateX(${left}px)`;
+        // myShooter.style.left = left + 'px'
         }
     }
 
@@ -134,14 +137,18 @@
         countBullet++
         let name = "myBullet" + countBullet;
         const myBullet = document.createElement("img")
-        const shooterHeight = document.getElementById("myShooter")?.offsetHeight || 50;
         myBullet.id = name
         myBullet.src = "images/bulletMine.png"
         myBullet.style.width = "0.5vw";
         let bulletShooterWidth = vwToPx(0.5);
         myBullet.style.position = "absolute"
         myBullet.style.left = left + shooterWidth/2 - bulletShooterWidth/2 + 'px';
-        myBullet.style.bottom =  19 + pxToVh(shooterHeight) + "vh";
+        bottom = 19 + pxToVh(shooterHeight);
+        myBullet.style.bottom = bottom + "vh";
+        myBullet.style.transform = `translateY(${0}vh)`
+        myBullet.dataset.bottom = bottom;
+        myBullet.dataset.offset = 0;
+        // myBullet.style.bottom =  19 + pxToVh(shooterHeight) + "vh";
         game.appendChild(myBullet);
         bullets.push(myBullet)
     }
@@ -150,18 +157,15 @@
 
     function moveBullets() {
         for (let bullet of bullets) {
-            let bottomStr = bullet.style.bottom
-            if (bottomStr.endsWith("vh")) {
-            bottomStr = bullet.style.bottom.slice(0,-2)
-            } else {
-                continue
-            }
-            let bottom = parseFloat(bottomStr, 10)
-            bottom += 2
-            if (bottom >= 88) {
+            let bottom = parseFloat(bullet.dataset.bottom)
+            let offset = parseFloat(bullet.dataset.offset)
+            offset -= 2;
+            bullet.dataset.offset = offset
+            if (bottom - offset >= 88) {
                 bullet.remove()
             } else {
-            bullet.style.bottom = bottom + 'vh';
+            bullet.style.transform = `translateY(${offset}vh)`
+            // bullet.style.bottom = bottom + 'vh';
             }
         }
     }
