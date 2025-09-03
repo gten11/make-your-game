@@ -159,9 +159,9 @@
         for (let bullet of bullets) {
             let bottom = parseFloat(bullet.dataset.bottom)
             let offset = parseFloat(bullet.dataset.offset)
-            offset -= 2;
+            offset -= 1;
             bullet.dataset.offset = offset
-            if (bottom - offset >= 88) {
+            if (bottom - offset >= 97) {
                 bullet.remove()
             } else {
             bullet.style.transform = `translateY(${offset}vh)`
