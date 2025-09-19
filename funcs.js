@@ -89,7 +89,7 @@
         alien1.style.position = "absolute"
         alien1.style.width = "3vw"
         alien1.style.left = (totalAliens1 * 5) + "vw"
-        alien1.style.bottom = "50vh"
+        alien1.style.bottom = "90vh"
         game.appendChild(alien1)
         aliens1.push(alien1)
         totalAliens1++
@@ -170,34 +170,6 @@
         }
     }
 
-    function gameLoop() {
-        if (stopGame) {
-            return
-        }
-        if (!shooterRemoved) {
-        moveShooter()
-        const bulletWidth = vwToPx(0.5)
-        let bulletLeft = left + shooterWidth/2 - bulletWidth/2
-        if (left % 15 === 0 && !((bulletLeft + bulletWidth/2> asteroid1Left && bulletLeft + bulletWidth/2 < asteroid1Right) || (bulletLeft + bulletWidth/2 > asteroid2Left && bulletLeft + bulletWidth/2 < asteroid2Right) || (bulletLeft + bulletWidth/2 > asteroid3Left && bulletLeft + bulletWidth/2 < asteroid3Right) || (bulletLeft + bulletWidth/2> asteroid4Left && bulletLeft + bulletWidth/2 < asteroid4Right)) ) {
-            myBullets()
-        }
-        }
-        moveBullets()
-        requestAnimationFrame(gameLoop)
-        
-    }
-
-    document.addEventListener("keydown", (event) => {
-        if (event.key === " ") {
-            stopGame = !stopGame;
-            if (!stopGame) {
-            gameLoop()
-        }
-        }
-    })
-    
-    gameLoop()
-  
     let movingRight = false;
     let movingLeft = false;
 
@@ -231,7 +203,7 @@
         let myShipRect = myShip.getBoundingClientRect()
         let buffer = myShipWidth/2 - 5
         let isOverlapping = !(myShooterRect.left - buffer >= myShipRect.right || myShooterRect.right <= myShipRect.left - buffer);
-        if (isOverlapping && !collisionShown && shipMoving) {
+        if (isOverlapping && !collisionShown && shipMoving && !shooterRemoved) {
             let alertCollision =  document.createElement("div")
             alertCollision.textContent = "⚠ Collision imminent!"
             alertCollision.style.position = "absolute"
@@ -258,7 +230,7 @@
         left = Math.max(leftMostPosition, Math.min(left, gameWidth - myShipWidth / 2))
         myShip.style.left = left + 'px';
 
-        requestAnimationFrame(moveShip);
+        // requestAnimationFrame(moveShip);
     }
 
     moveShip()
@@ -345,7 +317,37 @@
                 }
             }
         }
-        requestAnimationFrame(shootBullet)
+        // requestAnimationFrame(shootBullet)
     }
+
+     function gameLoop() {
+        if (stopGame) {
+            return
+        }
+        if (!shooterRemoved) {
+        moveShooter()
+        const bulletWidth = vwToPx(0.5)
+        let bulletLeft = left + shooterWidth/2 - bulletWidth/2
+        if (left % 15 === 0 && !((bulletLeft + bulletWidth/2> asteroid1Left && bulletLeft + bulletWidth/2 < asteroid1Right) || (bulletLeft + bulletWidth/2 > asteroid2Left && bulletLeft + bulletWidth/2 < asteroid2Right) || (bulletLeft + bulletWidth/2 > asteroid3Left && bulletLeft + bulletWidth/2 < asteroid3Right) || (bulletLeft + bulletWidth/2> asteroid4Left && bulletLeft + bulletWidth/2 < asteroid4Right)) ) {
+            myBullets()
+        }
+        }
+        moveBullets()
+        moveShip()
+        shootBullet()
+        requestAnimationFrame(gameLoop)
+        
+    }
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === " ") {
+            stopGame = !stopGame;
+            if (!stopGame) {
+            gameLoop()
+        }
+        }
+    })
+    
+    gameLoop()
     
  })
