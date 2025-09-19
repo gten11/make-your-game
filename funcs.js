@@ -194,6 +194,22 @@
             let offset = parseFloat(bullet.dataset.offset)
             offset -= 1;
             bullet.dataset.offset = offset
+            for (let alien of aliens) {
+                if (isOverlapping(bullet, alien)) {
+                let alienLocation = alien.getBoundingClientRect()
+                let alienBottom = gameWhere.height - alienLocation.height + (alienLocation.bottom - gameWhere.top);
+                alien.remove()
+                aliens.filter(a => a != alien)
+                let expl = document.createElement("img")
+                expl.src = "images/explosion.png"
+                expl.style.position = "absolute";
+                expl.style.bottom = alienBottom + "px";
+                expl.style.width = "3vw";
+                expl.style.left = alienLocation.left -gameLeft + "px";
+                expl.style.animation = "fadeOut 3s forwards"
+                game.appendChild(expl)
+                }
+            }
             if (bottom - offset >= 97) {
                 bullet.remove()
             } else {
