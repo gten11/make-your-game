@@ -44,7 +44,6 @@
         return false
     }
 
-
     function startGame() {
         const gameName = document.getElementById("gameName")
         const instr = document.getElementById("instructionStart")
@@ -75,28 +74,44 @@
         return (vh / 100) * window.innerHeight;
     }
 
-    let aliens1 = []
-    let countAlien1 = 7
-    let totalAliens1 = 0
-    // let aliens2 = []
-    // let aliens3 = []
-    // let aliens4 = []
+    let aliens = []
+    let countAliens = 28
+    let totalAliens = 0
 
-   const alien1Interval = setInterval(() => {
-        if (gameStarted && countAlien1 > totalAliens1) {
-        let alien1 = document.createElement("img")
-        alien1.src = "images/ship1.png"
-        alien1.style.position = "absolute"
-        alien1.style.width = "3vw"
-        alien1.style.left = (totalAliens1 * 5) + "vw"
-        alien1.style.bottom = "90vh"
-        game.appendChild(alien1)
-        aliens1.push(alien1)
-        totalAliens1++
-        } else {
-        clearInterval(alien1Interval)
+   const alienInterval = setInterval(() => {
+        if (gameStarted && countAliens > totalAliens) {
+            let alien = document.createElement("img")
+            alien.style.position = "absolute"
+            switch (true) {
+                case (totalAliens < 7) :
+                alien.src = "images/ship1.png"
+                alien.style.bottom = "92.5vh"
+                alien.style.left = (totalAliens * 5) + "vw"
+                break
+                case (totalAliens >= 7 && totalAliens < 14): 
+                alien.src = "images/ship2.png"
+                alien.style.bottom = "85.5vh"
+                alien.style.left = ((totalAliens - 7 ) * 5) + "vw"
+                break
+                case (totalAliens >= 14 && totalAliens < 21):
+                alien.src = "images/ship3.png"
+                alien.style.bottom = "78.5vh"
+                alien.style.left = ((totalAliens - 14) * 5) + "vw"
+                break
+                case (totalAliens >= 21):
+                alien.src = "images/ship4.png"
+                alien.style.bottom = "71.5vh"
+                alien.style.left = ((totalAliens - 21) * 5) + "vw"
+                break
+            }
+        alien.style.width = "3vw"
+        game.appendChild(alien)
+        aliens.push(alien)
+        totalAliens++
+        } else if (countAliens === totalAliens) {
+        clearInterval(alienInterval)
         }
-    }, 1000)
+    }, 200)
     
 
     let bullets = []
@@ -229,8 +244,6 @@
         }
         left = Math.max(leftMostPosition, Math.min(left, gameWidth - myShipWidth / 2))
         myShip.style.left = left + 'px';
-
-        // requestAnimationFrame(moveShip);
     }
 
     moveShip()
@@ -299,6 +312,7 @@
                 expl.style.left = myShooterLocation.left -gameLeft + "px";
                 expl.style.animation = "fadeOut 3s forwards"
                 game.appendChild(expl)
+    
             } else if (!(bulletLeft > asteroid1Left && bulletLeft < asteroid1Right) && !(bulletLeft > asteroid2Left && bulletLeft < asteroid2Right) && !(bulletLeft > asteroid3Left && bulletLeft < asteroid3Right) && !(bulletLeft > asteroid4Left && bulletLeft < asteroid4Right)) {
                 if (bulletBottomNum + bulletHeight + 5 < gameHeight) {
                     bulletBottomNum += 10;
@@ -317,7 +331,6 @@
                 }
             }
         }
-        // requestAnimationFrame(shootBullet)
     }
 
      function gameLoop() {
