@@ -290,7 +290,7 @@
         shipBullets.push(shipBullet)
         game.appendChild(shipBullet)
         }
-    }                       
+    }      
     
     function shootBullet() {
        
@@ -300,6 +300,22 @@
             let bulletBottomstr = bullet.style.bottom.slice(0,-2)
             let bulletBottomNum = vhToPx(parseFloat(bulletBottomstr, 10))
             let bulletLeft = bulletRect.left + vwToPx(1)/2 - gameLeft
+            for (let alien of aliens) {
+                if (isOverlapping(bullet, alien)) {
+                let alienLocation = alien.getBoundingClientRect()
+                let alienBottom = gameWhere.height - alienLocation.height + (alienLocation.bottom - gameWhere.top);
+                alien.remove()
+                aliens.filter(a => a != alien)
+                let expl = document.createElement("img")
+                expl.src = "images/explosion.png"
+                expl.style.position = "absolute";
+                expl.style.bottom = alienBottom + "px";
+                expl.style.width = "3vw";
+                expl.style.left = alienLocation.left -gameLeft + "px";
+                expl.style.animation = "fadeOut 3s forwards"
+                game.appendChild(expl)
+                }
+            }
             if (isOverlapping(bullet, myShooter)) {
                 let myShooterLocation = myShooter.getBoundingClientRect()
                 shooterRemoved = true
@@ -312,7 +328,6 @@
                 expl.style.left = myShooterLocation.left -gameLeft + "px";
                 expl.style.animation = "fadeOut 3s forwards"
                 game.appendChild(expl)
-    
             } else if (!(bulletLeft > asteroid1Left && bulletLeft < asteroid1Right) && !(bulletLeft > asteroid2Left && bulletLeft < asteroid2Right) && !(bulletLeft > asteroid3Left && bulletLeft < asteroid3Right) && !(bulletLeft > asteroid4Left && bulletLeft < asteroid4Right)) {
                 if (bulletBottomNum + bulletHeight + 5 < gameHeight) {
                     bulletBottomNum += 10;
@@ -332,6 +347,7 @@
             }
         }
     }
+
 
      function gameLoop() {
         if (stopGame) {
