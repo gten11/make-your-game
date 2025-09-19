@@ -133,7 +133,7 @@
     }
 
     let alienBullets = []
-
+    
     function createAlienBullets() {
         for (let i = 0; i < aliens.length; i++) {
         let name = "alienBullet" + i;
@@ -152,15 +152,15 @@
         alienBullet.dataset.bottom = bottom;
         alienBullet.dataset.offset = 0;
         game.appendChild(alienBullet);
-        bullets.push(alienBullet)
+        alienBullets.push(alienBullet)
         }
     }
 
     function moveAlienBullets() {
-        for (let bullet of alienBulletsbullets) {
+        for (let bullet of alienBullets) {
             let bottom = parseFloat(bullet.dataset.bottom)
-            let offset = parseFloat(bullet.dataset.offset)
-            offset += 1;
+            let alienBulletOffset = parseFloat(bullet.dataset.offset)
+            alienBulletOffset -= 1;
             bullet.dataset.offset = offset
             if (isOverlapping(bullet, myShip)) {
                 let myShipLocation = myShip.getBoundingClientRect()
@@ -179,14 +179,14 @@
                 expl.style.animation = "fadeOut 3s forwards"
                 game.appendChild(expl)
                 }
-            }
-            if (bottom - offset <= 5) {
+            if (bottom - alienBulletOffset <= 5) {
                 bullet.remove()
             } else {
-            bullet.style.transform = `translateY(${offset}vh)`
+            bullet.style.transform = `translateY(${alienBulletOffset}vh)`
             // bullet.style.bottom = bottom + 'vh';
             }
         }
+    }
     
 
     let bullets = []
@@ -452,6 +452,10 @@
             myBullets()
         }
         }
+        if (aliens.length > 0 && alienBullets.length < aliens.length) {
+            createAlienBullets()
+        }
+        // moveAlienBullets()
         moveBullets()
         moveShip()
         shootBullet()
