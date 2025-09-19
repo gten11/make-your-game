@@ -85,35 +85,53 @@
             switch (true) {
                 case (totalAliens < 7) :
                 alien.src = "images/ship1.png"
-                alien.style.bottom = "92.5vh"
+                alien.style.bottom = "71.5vh"
                 alien.style.left = (totalAliens * 5) + "vw"
                 break
                 case (totalAliens >= 7 && totalAliens < 14): 
                 alien.src = "images/ship2.png"
-                alien.style.bottom = "85.5vh"
-                alien.style.left = ((totalAliens - 7 ) * 5) + "vw"
+                alien.style.bottom = "78.5vh"
+                alien.style.left = ((totalAliens - 7 ) * 5 + 2) + "vw"
                 break
                 case (totalAliens >= 14 && totalAliens < 21):
                 alien.src = "images/ship3.png"
-                alien.style.bottom = "78.5vh"
-                alien.style.left = ((totalAliens - 14) * 5) + "vw"
+                alien.style.bottom = "85.5vh"
+                alien.style.left = ((totalAliens - 14) * 5 + 4) + "vw"
                 break
                 case (totalAliens >= 21):
                 alien.src = "images/ship4.png"
-                alien.style.bottom = "71.5vh"
-                alien.style.left = ((totalAliens - 21) * 5) + "vw"
+                alien.style.bottom = "92.5vh"
+                alien.style.left = ((totalAliens - 21) * 5 + 6) + "vw"
                 break
             }
         alien.style.width = "3vw"
         game.appendChild(alien)
+        alien.dataset.baseLeft = alien.offsetLeft
         aliens.push(alien)
         totalAliens++
         } else if (countAliens === totalAliens) {
         clearInterval(alienInterval)
         }
     }, 200)
-    
 
+    let aliensOffset = 0
+    let aliensDirection = 1
+
+    function moveAliens() {
+
+        let alienWidth = vwToPx(3)
+        let maxRight = Math.max(...aliens.map(a => parseFloat(a.dataset.baseLeft) + aliensOffset + alienWidth))
+        let minLeft = Math.min(...aliens.map(a => parseFloat(a.dataset.baseLeft) + aliensOffset))
+            if (maxRight >= gameWhere.width || minLeft <= 5) {
+            aliensDirection *= (-1)
+            }
+            aliensOffset += aliensDirection * 2;
+            for (let alien of aliens) {
+            alien.style.transform = `translateX(${aliensOffset}px)`;
+            }
+    }
+    
+    
     let bullets = []
     let left = 0;
     let countBullet = 0;
@@ -218,7 +236,7 @@
         let myShipRect = myShip.getBoundingClientRect()
         let buffer = myShipWidth/2 - 5
         let isOverlapping = !(myShooterRect.left - buffer >= myShipRect.right || myShooterRect.right <= myShipRect.left - buffer);
-        if (isOverlapping && !collisionShown && shipMoving && !shooterRemoved) {
+        if (isOverlapping && !collisionShown && shipMoving && !shooterRemoved && shootingBullets) {
             let alertCollision =  document.createElement("div")
             alertCollision.textContent = "⚠ Collision imminent!"
             alertCollision.style.position = "absolute"
@@ -250,7 +268,7 @@
    
     const shipBulletWidth = 0.5
     let shipBullets = []
-    let animating = false
+    let shootingBullets = false
     var intervalId;
 
     document.addEventListener("keydown", (event) => {
@@ -261,7 +279,7 @@
             }
             if (!animating) {
             shootBullet()
-            animating = true
+            shootingBullets = true
             }
         } 
     })
@@ -364,6 +382,7 @@
         moveBullets()
         moveShip()
         shootBullet()
+        moveAliens()
         requestAnimationFrame(gameLoop)
         
     }
