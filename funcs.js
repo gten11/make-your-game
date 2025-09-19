@@ -4,6 +4,7 @@
 
 
     let stopGame = true
+    let lives = 3
     let game = document.getElementById("game")
     let myShooter = document.getElementById("myShooter")
     let asteroid1 = document.getElementById("asteroid1")
@@ -130,8 +131,64 @@
             alien.style.transform = `translateX(${aliensOffset}px)`;
             }
     }
+
+    let alienBullets = []
+
+    function createAlienBullets() {
+        for (let i = 0; i < aliens.length; i++) {
+        let name = "alienBullet" + i;
+        let alienRect = aliens[i].getBoundingClientRect()
+        let alienWidth = alienRect.width
+        const alienBullet = document.createElement("img")
+        alienBullet.id = name
+        alienBullet.src = "images/bullet.png"
+        alienBullet.style.width = "0.7vw";
+        let bulletAlienWidth = vwToPx(0.7);
+        alienBullet.style.position = "absolute"
+        alienBullet.style.left = alienRect.left + alienWidth/2 - bulletAlienWidth/2 + 'px';
+        bottom = aliens[i].bottom;
+        alienBullet.style.bottom = bottom + "vh";
+        alienBullet.style.transform = `translateY(${0}vh)`
+        alienBullet.dataset.bottom = bottom;
+        alienBullet.dataset.offset = 0;
+        game.appendChild(alienBullet);
+        bullets.push(alienBullet)
+        }
+    }
+
+    function moveAlienBullets() {
+        for (let bullet of alienBulletsbullets) {
+            let bottom = parseFloat(bullet.dataset.bottom)
+            let offset = parseFloat(bullet.dataset.offset)
+            offset += 1;
+            bullet.dataset.offset = offset
+            if (isOverlapping(bullet, myShip)) {
+                let myShipLocation = myShip.getBoundingClientRect()
+                let myShipBottom = gameWhere.height - myShipLocation.height + (myShipLocation.bottom - gameWhere.top);
+                if (lives === 0) {
+                myShip.remove()
+                } else {
+                    lives--
+                }
+                let expl = document.createElement("img")
+                expl.src = "images/explosion.png"
+                expl.style.position = "absolute";
+                expl.style.bottom = myShipBottom + "px";
+                expl.style.width = "3vw";
+                expl.style.left = myShipLocation.left -gameLeft + "px";
+                expl.style.animation = "fadeOut 3s forwards"
+                game.appendChild(expl)
+                }
+            }
+            if (bottom - offset <= 5) {
+                bullet.remove()
+            } else {
+            bullet.style.transform = `translateY(${offset}vh)`
+            // bullet.style.bottom = bottom + 'vh';
+            }
+        }
     
-    
+
     let bullets = []
     let left = 0;
     let countBullet = 0;
@@ -293,7 +350,7 @@
             createBullets()
             intervalId = setInterval(createBullets, 200)
             }
-            if (!animating) {
+            if (!shootingBullets) {
             shootBullet()
             shootingBullets = true
             }
