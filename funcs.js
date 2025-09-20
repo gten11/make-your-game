@@ -4,7 +4,7 @@
 
 
     let stopGame = true
-    let lives = 3
+    let lives = 4
     let game = document.getElementById("game")
     let myShooter = document.getElementById("myShooter")
     let asteroid1 = document.getElementById("asteroid1")
@@ -202,13 +202,13 @@
                 myShip.remove()
                 game.appendChild(explShip)
                 } else {
-                    lives--
                     let id = bullet.id.slice(11)
                     bullet.remove()
                     alienBullets = alienBullets.filter(b =>  b != bullet)
                     bulletsMap.delete(id)
                     let alertLife =  document.createElement("div")
                     alertLife.textContent = "⚠ Life lost! " + `${lives}` + " lives remain"
+                    lives--
                     alertLife.style.position = "absolute"
                     alertLife.style.left = "50%"
                     alertLife.style.top = "50%"
