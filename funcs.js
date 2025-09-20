@@ -78,6 +78,7 @@
     let aliens = []
     let countAliens = 28
     let totalAliens = 0
+    let alienId = 1
 
    const alienInterval = setInterval(() => {
         if (gameStarted && countAliens > totalAliens) {
@@ -105,11 +106,13 @@
                 alien.style.left = ((totalAliens - 21) * 5 + 6) + "vw"
                 break
             }
+        alien.id = "alien" + alienId
         alien.style.width = "3vw"
         game.appendChild(alien)
         alien.dataset.baseLeft = alien.offsetLeft
         aliens.push(alien)
         totalAliens++
+        alienId++
         } else if (countAliens === totalAliens) {
         clearInterval(alienInterval)
         }
@@ -133,10 +136,13 @@
     }
 
     let alienBullets = []
+    let bulletsMap = new Map()
     
     function createAlienBullets() {
         for (let i = 0; i < aliens.length; i++) {
-        let name = "alienBullet" + i;
+            let alienId = aliens[i].id.slice(5)
+            if (!bulletsMap.has(alienId)) {
+        let name = "alienBullet" + aliens[i].id.slice(5);
         let alienRect = aliens[i].getBoundingClientRect()
         let alienWidth = alienRect.width
         const alienBullet = document.createElement("img")
@@ -146,44 +152,84 @@
         let bulletAlienWidth = vwToPx(0.7);
         alienBullet.style.position = "absolute"
         alienBullet.style.left = alienRect.left + alienWidth/2 - bulletAlienWidth/2 + 'px';
-        bottom = aliens[i].bottom;
-        alienBullet.style.bottom = bottom + "vh";
+        let bottom = aliens[i].style.bottom;
+        alienBullet.style.bottom = bottom;
         alienBullet.style.transform = `translateY(${0}vh)`
-        alienBullet.dataset.bottom = bottom;
+        alienBullet.dataset.bottom = bottom.slice(0,-2);
         alienBullet.dataset.offset = 0;
         game.appendChild(alienBullet);
         alienBullets.push(alienBullet)
+        bulletsMap.set(alienId, alienBullet)
         }
     }
+    }
+
+    let alertLifeShown = false
 
     function moveAlienBullets() {
         for (let bullet of alienBullets) {
             let bottom = parseFloat(bullet.dataset.bottom)
             let alienBulletOffset = parseFloat(bullet.dataset.offset)
-            alienBulletOffset -= 1;
-            bullet.dataset.offset = offset
-            if (isOverlapping(bullet, myShip)) {
+            alienBulletOffset += 1;
+            bullet.dataset.offset = alienBulletOffset;
+            if (isOverlapping(bullet, myShip) && !alertLifeShown) {
+                let id = bullet.id.slice(11)
+                bullet.remove()
+                alienBullets = alienBullets.filter(b =>  b != bullet)
+                bulletsMap.delete(id)
                 let myShipLocation = myShip.getBoundingClientRect()
-                let myShipBottom = gameWhere.height - myShipLocation.height + (myShipLocation.bottom - gameWhere.top);
+                console.log("ship left", myShipLocation.left)
+                console.log("game width", gameWhere.width)
                 if (lives === 0) {
+                stopGame = true
+                let alertGameOver =  document.createElement("div")
+                alertGameOver.textContent = "⚠ GAME OVER"
+                alertGameOver.style.position = "absolute"
+                alertGameOver.style.left = "50%"
+                alertGameOver.style.top = "50%"
+                alertGameOver.style.transform = "translate(-50%, -50%)"
+                alertGameOver.style.color = "red"
+                alertGameOver.style.size = "10rem";
+                game.appendChild(alertGameOver)
+                let explShip = document.createElement("img")
+                explShip.src = "images/explosion.png"
+                explShip.style.position = "absolute";
+                explShip.style.bottom = 0.5 + "vh";
+                explShip.style.width = "3vw";
+                explShip.style.left = myShipLocation.left -gameLeft + "px";
+                console.log(explShip.style.left)
+                explShip.style.animation = "fadeOut 3s forwards"
                 myShip.remove()
+                game.appendChild(explShip)
                 } else {
                     lives--
+                    let id = bullet.id.slice(11)
+                    bullet.remove()
+                    alienBullets = alienBullets.filter(b =>  b != bullet)
+                    bulletsMap.delete(id)
+                    let alertLife =  document.createElement("div")
+                    alertLife.textContent = "⚠ Life lost! " + `${lives}` + " lives remain"
+                    alertLife.style.position = "absolute"
+                    alertLife.style.left = "50%"
+                    alertLife.style.top = "50%"
+                    alertLife.style.transform = "translate(-50%, -50%)"
+                    alertLife.style.color = "red"
+                    alertLife.style.size = "10rem";
+                    game.appendChild(alertLife)
+                    alertLifeShown = true
+                    setTimeout(() => {
+                    alertLife.remove()
+                    alertLifeShown = false;
+            }, 1000)
                 }
-                let expl = document.createElement("img")
-                expl.src = "images/explosion.png"
-                expl.style.position = "absolute";
-                expl.style.bottom = myShipBottom + "px";
-                expl.style.width = "3vw";
-                expl.style.left = myShipLocation.left -gameLeft + "px";
-                expl.style.animation = "fadeOut 3s forwards"
-                game.appendChild(expl)
-                }
+            }
             if (bottom - alienBulletOffset <= 5) {
+                let id = bullet.id.slice(11)
                 bullet.remove()
+                alienBullets = alienBullets.filter(b => b != bullet)
+                bulletsMap.delete(id)
             } else {
             bullet.style.transform = `translateY(${alienBulletOffset}vh)`
-            // bullet.style.bottom = bottom + 'vh';
             }
         }
     }
@@ -210,8 +256,6 @@
             direction *= (-1);
         }
         myShooter.style.transform = `translateX(${left}px)`;
-        // myShooter.style.left = left + 'px' changed to transform to lesses paint
-    
         } else if (shipMoving) {
             direction *= (-1);
             left += direction * 2;
@@ -219,7 +263,6 @@
             direction *= (-1);
         }
         myShooter.style.transform = `translateX(${left}px)`;
-        // myShooter.style.left = left + 'px'
         }
     }
 
@@ -446,22 +489,19 @@
         }
         if (!shooterRemoved) {
         moveShooter()
+        moveShip()
         const bulletWidth = vwToPx(0.5)
         let bulletLeft = left + shooterWidth/2 - bulletWidth/2
         if (left % 15 === 0 && !((bulletLeft + bulletWidth/2> asteroid1Left && bulletLeft + bulletWidth/2 < asteroid1Right) || (bulletLeft + bulletWidth/2 > asteroid2Left && bulletLeft + bulletWidth/2 < asteroid2Right) || (bulletLeft + bulletWidth/2 > asteroid3Left && bulletLeft + bulletWidth/2 < asteroid3Right) || (bulletLeft + bulletWidth/2> asteroid4Left && bulletLeft + bulletWidth/2 < asteroid4Right)) ) {
             myBullets()
         }
         }
-        if (aliens.length > 0 && alienBullets.length < aliens.length) {
-            createAlienBullets()
-        }
-        // moveAlienBullets()
-        moveBullets()
-        moveShip()
-        shootBullet()
         moveAliens()
+        createAlienBullets()
+        moveAlienBullets()
+        moveBullets()
+        shootBullet()
         requestAnimationFrame(gameLoop)
-        
     }
 
     document.addEventListener("keydown", (event) => {
