@@ -194,7 +194,8 @@
                 alertGameOver.style.top = "50%"
                 alertGameOver.style.transform = "translate(-50%, -50%)"
                 alertGameOver.style.color = "red"
-                alertGameOver.style.size = "10rem";
+                alertGameOver.style.fontSize = "6rem";
+                alertGameOver.style.zIndex = "9999"
                 game.appendChild(alertGameOver)
                 let explShip = document.createElement("img")
                 explShip.src = "images/explosion.png"
@@ -218,7 +219,8 @@
                     alertLife.style.top = "50%"
                     alertLife.style.transform = "translate(-50%, -50%)"
                     alertLife.style.color = "red"
-                    alertLife.style.size = "10rem";
+                    alertLife.style.fontSize = "2rem";
+                    alertLife.style.zIndex = "9998"
                     game.appendChild(alertLife)
                     alertLifeShown = true
                     setTimeout(() => {
@@ -377,7 +379,8 @@
             alertCollision.style.top = "50%"
             alertCollision.style.transform = "translate(-50%, -50%)"
             alertCollision.style.color = "red"
-            alertCollision.style.size = "10rem";
+            alertCollision.style.fontSize = "2rem";
+            alertCollision.style.zIndex = "9997"
             game.appendChild(alertCollision)
             collisionShown = true
             setTimeout(() => {
