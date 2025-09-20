@@ -26,6 +26,10 @@
     let asteroid3Right = asteroidWhere3.right - gameLeft
     let asteroid4Left = asteroidWhere4.left - gameLeft
     let asteroid4Right = asteroidWhere4.right - gameLeft
+    let asteroid1Top = asteroidWhere1.bottom - asteroidWhere1.height
+    let asteroid2Top = asteroidWhere2.bottom - asteroidWhere2.height
+    let asteroid3Top = asteroidWhere3.bottom - asteroidWhere3.height
+    let asteroid4Top = asteroidWhere4.bottom - asteroidWhere4.height
     let gameWidth = document.getElementById("game").offsetWidth;
     const myShip = document.getElementById("myShip")
     let shooterHeight = document.getElementById("myShooter")?.offsetHeight || 26;
@@ -79,6 +83,7 @@
     let countAliens = 28
     let totalAliens = 0
     let alienId = 1
+    let aliensMap = new Map()
 
    const alienInterval = setInterval(() => {
         if (gameStarted && countAliens > totalAliens) {
@@ -106,7 +111,9 @@
                 alien.style.left = ((totalAliens - 21) * 5 + 6) + "vw"
                 break
             }
-        alien.id = "alien" + alienId
+        let alienIdStr =  "alien" + alienId
+        alien.id = alienIdStr
+        aliensMap.set(alienIdStr, true)
         alien.style.width = "3vw"
         game.appendChild(alien)
         alien.dataset.baseLeft = alien.offsetLeft
@@ -141,15 +148,15 @@
     function createAlienBullets() {
         for (let i = 0; i < aliens.length; i++) {
             let alienId = aliens[i].id.slice(5)
-            if (!bulletsMap.has(alienId)) {
+            if (!bulletsMap.has(alienId) && aliensMap.get(aliens[i].id) === true) {
         let name = "alienBullet" + aliens[i].id.slice(5);
         let alienRect = aliens[i].getBoundingClientRect()
         let alienWidth = alienRect.width
         const alienBullet = document.createElement("img")
         alienBullet.id = name
         alienBullet.src = "images/bullet.png"
-        alienBullet.style.width = "0.7vw";
-        let bulletAlienWidth = vwToPx(0.7);
+        alienBullet.style.width = "0.5vw";
+        let bulletAlienWidth = vwToPx(0.5);
         alienBullet.style.position = "absolute"
         alienBullet.style.left = alienRect.left + alienWidth/2 - bulletAlienWidth/2 + 'px';
         let bottom = aliens[i].style.bottom;
@@ -178,8 +185,6 @@
                 alienBullets = alienBullets.filter(b =>  b != bullet)
                 bulletsMap.delete(id)
                 let myShipLocation = myShip.getBoundingClientRect()
-                console.log("ship left", myShipLocation.left)
-                console.log("game width", gameWhere.width)
                 if (lives === 0) {
                 stopGame = true
                 let alertGameOver =  document.createElement("div")
@@ -197,7 +202,6 @@
                 explShip.style.bottom = 0.5 + "vh";
                 explShip.style.width = "3vw";
                 explShip.style.left = myShipLocation.left -gameLeft + "px";
-                console.log(explShip.style.left)
                 explShip.style.animation = "fadeOut 3s forwards"
                 myShip.remove()
                 game.appendChild(explShip)
@@ -223,6 +227,16 @@
             }, 1000)
                 }
             }
+            let bulletRect = bullet.getBoundingClientRect()
+            let bulletLeft = bulletRect.left
+            let bulletWidth = bulletRect.width
+            let bulletBottom = bulletRect.bottom
+            if ((bulletLeft - bulletWidth > asteroid1Left && bulletLeft - bulletWidth < asteroid1Right && bulletBottom <= asteroid1Top) || (bulletLeft - bulletWidth > asteroid2Left && bulletLeft - bulletWidth < asteroid2Right  && bulletBottom <= asteroid2Top) || (bulletLeft - bulletWidth > asteroid3Left && bulletLeft - bulletWidth < asteroid3Right  && bulletBottom <= asteroid3Top) || (bulletLeft - bulletWidth > asteroid4Left && bulletLeft - bulletWidth < asteroid4Right  && bulletBottom <= asteroid4Top)) { 
+                let id = bullet.id.slice(11)
+                bullet.remove()
+                alienBullets = alienBullets.filter(b => b != bullet)
+                bulletsMap.delete(id)
+                }
             if (bottom - alienBulletOffset <= 5) {
                 let id = bullet.id.slice(11)
                 bullet.remove()
@@ -286,8 +300,6 @@
         bullets.push(myBullet)
     }
 
-    //I need to make an explosion if my bullets get into an object. 
-
     function moveBullets() {
         for (let bullet of bullets) {
             let bottom = parseFloat(bullet.dataset.bottom)
@@ -298,6 +310,11 @@
                 if (isOverlapping(bullet, alien)) {
                 let alienLocation = alien.getBoundingClientRect()
                 let alienBottom = gameWhere.height - alienLocation.height + (alienLocation.bottom - gameWhere.top);
+                let alienIdStr = alien.id
+                let alienId  = alienIdStr.slice(5)
+                aliensMap.set(alienIdStr, false)
+                bulletsMap.delete(alienId)
+                alienBullets.filter(b => b.id != "alienBullet" + alienId)
                 alien.remove()
                 aliens.filter(a => a != alien)
                 let expl = document.createElement("img")
@@ -368,14 +385,14 @@
                 collisionShown = false;
             }, 1000)
         }
-        if (!collisionShown) {
+        // if (!collisionShown) {
         if (movingLeft) {
             left -= 4;
         } else if (movingRight) {
             left += 4;
         } 
             
-        }
+        // }
         left = Math.max(leftMostPosition, Math.min(left, gameWidth - myShipWidth / 2))
         myShip.style.left = left + 'px';
     }
@@ -404,6 +421,7 @@
         if (event.key === "s") {
             clearInterval(intervalId);
             intervalId = null;
+            shootingBullets = false;
         }
     })
 
@@ -438,7 +456,14 @@
                 if (isOverlapping(bullet, alien)) {
                 let alienLocation = alien.getBoundingClientRect()
                 let alienBottom = gameWhere.height - alienLocation.height + (alienLocation.bottom - gameWhere.top);
-                alien.remove()
+                let id = alien.id.slice(5) 
+                let bulletOfAlien = bulletsMap.get(id)
+                alienBullets = alienBullets.filter(b => b != bulletOfAlien)
+                bulletsMap.delete(id)
+                if (bulletOfAlien !== undefined) {
+                bulletOfAlien.remove()
+                }
+                aliensMap.set(alien.id,false)
                 aliens.filter(a => a != alien)
                 let expl = document.createElement("img")
                 expl.src = "images/explosion.png"
@@ -447,6 +472,7 @@
                 expl.style.width = "3vw";
                 expl.style.left = alienLocation.left -gameLeft + "px";
                 expl.style.animation = "fadeOut 3s forwards"
+                alien.remove()
                 game.appendChild(expl)
                 }
             }
@@ -487,20 +513,20 @@
         if (stopGame) {
             return
         }
-        if (!shooterRemoved) {
-        moveShooter()
         moveShip()
-        const bulletWidth = vwToPx(0.5)
-        let bulletLeft = left + shooterWidth/2 - bulletWidth/2
-        if (left % 15 === 0 && !((bulletLeft + bulletWidth/2> asteroid1Left && bulletLeft + bulletWidth/2 < asteroid1Right) || (bulletLeft + bulletWidth/2 > asteroid2Left && bulletLeft + bulletWidth/2 < asteroid2Right) || (bulletLeft + bulletWidth/2 > asteroid3Left && bulletLeft + bulletWidth/2 < asteroid3Right) || (bulletLeft + bulletWidth/2> asteroid4Left && bulletLeft + bulletWidth/2 < asteroid4Right)) ) {
-            myBullets()
-        }
-        }
         moveAliens()
         createAlienBullets()
         moveAlienBullets()
         moveBullets()
         shootBullet()
+        if (!shooterRemoved) {
+        moveShooter()
+        const bulletWidth = vwToPx(0.5)
+        let bulletLeft = left + shooterWidth/2 - bulletWidth/2
+        if (left % 15 === 0 && !((bulletLeft + bulletWidth/2 > asteroid1Left && bulletLeft + bulletWidth/2 < asteroid1Right) || (bulletLeft + bulletWidth/2 > asteroid2Left && bulletLeft + bulletWidth/2 < asteroid2Right) || (bulletLeft + bulletWidth/2 > asteroid3Left && bulletLeft + bulletWidth/2 < asteroid3Right) || (bulletLeft + bulletWidth/2> asteroid4Left && bulletLeft + bulletWidth/2 < asteroid4Right)) ) {
+            myBullets()
+        }
+        }
         requestAnimationFrame(gameLoop)
     }
 
