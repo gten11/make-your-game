@@ -29,6 +29,32 @@
   white-space: pre-line;
 }
 
+#restartButton {
+    position: fixed;
+    top: 2vh;
+    left: 10vw;
+    color: rgb(64, 16, 70);
+    padding: 0.2em;
+    border-radius: 1em;
+    z-index: 9996;
+    font-size: 1em;
+    background-color: transparent;
+    border: 2px solid magenta;
+}
+
+#stopButton {
+    position: fixed;
+    top: 2vh;
+    left: 2vw;
+    color: rgb(64, 16, 70);
+    padding: 0.2em;
+    border-radius: 1em;
+    z-index: 9996;
+    font-size: 1em;
+    background-color: transparent;
+    border: 2px solid magenta;
+}
+
 
 #alertGameOver {
     white-space: pre-line; 
