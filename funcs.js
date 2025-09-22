@@ -4,7 +4,10 @@
 
 
     let stopGame = true
+    let gameOver = false
     let lives = 4
+    let score = 0
+    let alienWaves = 3
     let game = document.getElementById("game")
     let myShooter = document.getElementById("myShooter")
     let asteroid1 = document.getElementById("asteroid1")
@@ -37,6 +40,14 @@
     let shipMoving = false
     let shooterRemoved = false
     let gameStarted = false
+
+    let hud = document.createElement("div")
+    hud.id = "hud"
+    game.appendChild(hud)
+
+    function updateHud() {
+        hud.textContent = `Total score ${score}\nTotal lives: ${lives}`
+    }
 
         //obj1 must be smaller than obj2
     function isOverlapping(obj1, obj2) {
@@ -85,6 +96,10 @@
     let alienId = 1
     let aliensMap = new Map()
 
+    function sendAliens() {
+        if (alienWaves > 0 && totalAliens === 0) {
+            alienWaves--
+
    const alienInterval = setInterval(() => {
         if (gameStarted && countAliens > totalAliens) {
             let alien = document.createElement("img")
@@ -123,7 +138,18 @@
         } else if (countAliens === totalAliens) {
         clearInterval(alienInterval)
         }
-    }, 200)
+        }, 200)
+        } else {
+            stopGame = true
+            let alertGameOver =  document.createElement("div")
+            alertGameOver.id = "alertGameOver"
+            alertGameOver.textContent = `YOU WON\nTotal score is ${score}`;
+            gameOver = true
+            game.appendChild(alertGameOver)
+        }
+    }
+
+    sendAliens()
 
     let aliensOffset = 0
     let aliensDirection = 1
@@ -188,14 +214,9 @@
                 if (lives === 0) {
                 stopGame = true
                 let alertGameOver =  document.createElement("div")
-                alertGameOver.textContent = "⚠ GAME OVER"
-                alertGameOver.style.position = "absolute"
-                alertGameOver.style.left = "50%"
-                alertGameOver.style.top = "50%"
-                alertGameOver.style.transform = "translate(-50%, -50%)"
-                alertGameOver.style.color = "red"
-                alertGameOver.style.fontSize = "6rem";
-                alertGameOver.style.zIndex = "9999"
+                alertGameOver.id = "alertGameOver"
+                alertGameOver.textContent = `GAME OVER\nTotal score is ${score}`
+                gameOver = true
                 game.appendChild(alertGameOver)
                 let explShip = document.createElement("img")
                 explShip.src = "images/explosion.png"
@@ -214,12 +235,13 @@
                     let alertLife =  document.createElement("div")
                     alertLife.textContent = "⚠ Life lost! " + `${lives}` + " lives remain"
                     lives--
+                    score -= 30
                     alertLife.style.position = "absolute"
                     alertLife.style.left = "50%"
-                    alertLife.style.top = "50%"
+                    alertLife.style.bottom = "35vh"
                     alertLife.style.transform = "translate(-50%, -50%)"
                     alertLife.style.color = "red"
-                    alertLife.style.fontSize = "2rem";
+                    alertLife.style.fontSize = "2em";
                     alertLife.style.zIndex = "9998"
                     game.appendChild(alertLife)
                     alertLifeShown = true
@@ -318,6 +340,12 @@
                 bulletsMap.delete(alienId)
                 alienBullets.filter(b => b.id != "alienBullet" + alienId)
                 alien.remove()
+                score += 10
+                totalAliens--
+                if (totalAliens === 0) {
+                    sendAliens()
+                }
+                score += 10
                 aliens.filter(a => a != alien)
                 let expl = document.createElement("img")
                 expl.src = "images/explosion.png"
@@ -376,10 +404,10 @@
             alertCollision.textContent = "⚠ Collision imminent!"
             alertCollision.style.position = "absolute"
             alertCollision.style.left = "50%"
-            alertCollision.style.top = "50%"
+            alertCollision.style.bottom = "30vh"
             alertCollision.style.transform = "translate(-50%, -50%)"
             alertCollision.style.color = "red"
-            alertCollision.style.fontSize = "2rem";
+            alertCollision.style.fontSize = "1em";
             alertCollision.style.zIndex = "9997"
             game.appendChild(alertCollision)
             collisionShown = true
@@ -476,6 +504,11 @@
                 expl.style.left = alienLocation.left -gameLeft + "px";
                 expl.style.animation = "fadeOut 3s forwards"
                 alien.remove()
+                score += 10
+                totalAliens--
+                if (totalAliens === 0) {
+                    sendAliens()
+                }
                 game.appendChild(expl)
                 }
             }
@@ -483,6 +516,7 @@
                 let myShooterLocation = myShooter.getBoundingClientRect()
                 shooterRemoved = true
                 myShooter.remove()
+                score -= 20
                 let expl = document.createElement("img")
                 expl.src = "images/explosion.png"
                 expl.style.position = "absolute";
@@ -511,7 +545,6 @@
         }
     }
 
-
      function gameLoop() {
         if (stopGame) {
             return
@@ -530,11 +563,12 @@
             myBullets()
         }
         }
+        updateHud()
         requestAnimationFrame(gameLoop)
     }
 
     document.addEventListener("keydown", (event) => {
-        if (event.key === " ") {
+        if (event.key === " " && !gameOver) {
             stopGame = !stopGame;
             if (!stopGame) {
             gameLoop()

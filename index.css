@@ -18,6 +18,30 @@
     color: magenta;
 }
 
+#hud {
+  position: fixed;   
+  top: 2vh;
+  right: 5vw;
+  color: rgb(58, 12, 64);
+  font-size: 1em;
+  text-align: right;
+  z-index: 10000;
+  white-space: pre-line;
+}
+
+
+#alertGameOver {
+    white-space: pre-line; 
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: red;
+    font-size: 5em;
+    z-index: 9999;
+    text-align: center;
+}
+
 #instructionStart {
     position: absolute;
     top: 60%;
