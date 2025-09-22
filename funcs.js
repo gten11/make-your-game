@@ -65,12 +65,16 @@
         const instr = document.getElementById("instructionStart")
         gameName.style.animation = "fadeOut 3s forwards"
         instr.style.animation = "fadeOut 3s forwards"
+        stopgame = false
+        gameStarted = true
+        sendAliens()
+        gameLoop()
     }
 
     document.addEventListener("keydown", (event) => {
         if (event.key === " ") {
             startGame()
-            gameStarted = true
+            
         }
     })
 
@@ -132,6 +136,7 @@
         alien.style.width = "3vw"
         game.appendChild(alien)
         alien.dataset.baseLeft = alien.offsetLeft
+        alien.style.transform = `translateX(${aliensOffset}px)`
         aliens.push(alien)
         totalAliens++
         alienId++
@@ -148,8 +153,6 @@
             game.appendChild(alertGameOver)
         }
     }
-
-    sendAliens()
 
     let aliensOffset = 0
     let aliensDirection = 1
@@ -575,7 +578,5 @@
         }
         }
     })
-    
-    gameLoop()
-    
+
  })
