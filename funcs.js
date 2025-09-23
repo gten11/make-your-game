@@ -43,12 +43,25 @@
     let shooterRemoved = false
     let gameStarted = false
 
+    let alertCollision =  document.createElement("div")
+    alertCollision.classList.add("alerts")
+    alertCollision.textContent = "⚠ Collision imminent!"
+    alertCollision.style.position = "absolute"
+    alertCollision.style.left = "50%"
+    alertCollision.style.bottom = "30vh"
+    alertCollision.style.transform = "translate(-50%, -50%)"
+    alertCollision.style.color = "red"
+    alertCollision.style.fontSize = "1em";
+    alertCollision.style.zIndex = "940"
+    alertCollision.style.display = "none"
+    game.appendChild(alertCollision)
+
     let hud = document.createElement("div")
     hud.id = "hud"
     game.appendChild(hud)
 
     function updateHud() {
-        hud.textContent = `Total score ${score}\nAlien waves remain: ${alienWaves}\nTotal lives: ${lives}\nShooter lives ${shooterLives}`
+        hud.textContent = `Total score ${score}\nAlien waves remain: ${alienWaves}\nTotal lives: ${lives}\nShooter lives ${Math.max(shooterLives,0)}`
     }
 
     let popup = document.createElement("div")
@@ -57,12 +70,29 @@
     game.appendChild(popup)
 
     let restartBtn = document.createElement("div")
+    restartBtn.classList.add("popup-buttons")
     restartBtn.id = "button"
     restartBtn.textContent = "Restart"
     restartBtn.addEventListener("click", () => {
         restart()
     })
     popup.appendChild(restartBtn)
+
+    let continueBtn = document.createElement("div")
+    continueBtn.classList.add("popup-buttons")
+    continueBtn.id = "continueBtn"
+    continueBtn.textContent = "Pause"
+    continueBtn.addEventListener("click", () => {
+        if (!stopGame) {
+        stopGame = true
+        continueBtn.textContent = "Pause"
+        } else {
+        stopGame = false
+        continueBtn.textContent = "Continue"
+        startGame()
+        }
+    })
+    popup.appendChild(continueBtn)
 
     function restart() {
         stopGame = true
@@ -74,7 +104,8 @@
         lives = 4
         score = 0
         alienWaves = 3
-        document.querySelectorAll(".aliens, .alienBullets, .shipBullets, .myBullets, .alerts").forEach(el => el.remove())
+        document.querySelectorAll(".aliens, .alienBullets, .shipBullets, .myBullets").forEach(el => el.remove())
+        document.querySelectorAll(".alerts").forEach(al => al.style.display = "none")
         aliens = []
         countAliens = 28
         totalAliens = 0
@@ -90,6 +121,7 @@
         left = 0;
         direction = 1;
         shooterCollisionCooldown = false
+        collisionShown = false
         bottom = 0;
         movingRight = false;
         movingLeft = false;
@@ -134,7 +166,6 @@
         gameName.style.animation = "fadeOut 3s forwards"
         instr.style.animation = "fadeOut 3s forwards"
         gameStarted = true
-        shooterRemoved = false
         sendAliens()
         gameLoop()
     }
@@ -210,6 +241,7 @@
             stopGame = true
             let alertGameOver =  document.createElement("div")
             alertGameOver.classList.add("alerts")
+            alertGameOver.style.display = "block"
             alertGameOver.id = "alertGameOver"
             alertGameOver.textContent = `YOU WON\nTotal score is ${score}`;
             gameOver = true
@@ -220,14 +252,17 @@
     let aliensOffset = 0
     let aliensDirection = 1
     let alienWidth = vwToPx(3)
+    let alienDirectionFlipped = false
 
     function moveAliens() {
-        // let aliveAliens = aliens.filter(a => a.isConnected);
-        // if (aliveAliens.length === 0) return;
         let maxRight = Math.max(...aliens.map(a => parseFloat(a.dataset.baseLeft) + aliensOffset + alienWidth))
         let minLeft = Math.min(...aliens.map(a => parseFloat(a.dataset.baseLeft) + aliensOffset))
-            if (maxRight >= gameWhere.width - 10|| minLeft <= 10) {
+            if ((maxRight >= gameWhere.width - 10|| minLeft <= 10) && !alienDirectionFlipped) {
             aliensDirection *= (-1)
+            alienDirectionFlipped = true
+            setTimeout(() => {
+                alienDirectionFlipped = false
+            },1000)
             }
             aliensOffset += aliensDirection * 2;
             for (let alien of aliens) {
@@ -271,7 +306,7 @@
         for (let bullet of alienBullets) {
             let bottom = parseFloat(bullet.dataset.bottom)
             let alienBulletOffset = parseFloat(bullet.dataset.offset)
-            alienBulletOffset += 1;
+            alienBulletOffset += 1.2;
             bullet.dataset.offset = alienBulletOffset;
             if (isOverlapping(bullet, myShip) && !alertLifeShown) {
                 let id = bullet.id.slice(11)
@@ -283,6 +318,7 @@
                 stopGame = true
                 let alertGameOver =  document.createElement("div")
                 alertGameOver.classList.add("alerts")
+                alertGameOver.style.display = "block"
                 alertGameOver.id = "alertGameOver"
                 alertGameOver.textContent = `GAME OVER\nTotal score is ${score}`
                 gameOver = true
@@ -295,7 +331,6 @@
                 explShip.style.left = myShipLocation.left -gameLeft + "px";
                 explShip.style.animation = "fadeOut 3s forwards"
                 myShip.style.display = "none"
-                // myShip.remove()
                 game.appendChild(explShip)
                 } else {
                     let id = bullet.id.slice(11)
@@ -365,7 +400,6 @@
         }
     }
     
-
     let bullets = []
     let left = 0;
     let countBullet = 0;
@@ -378,18 +412,18 @@
         let myShooterRect = myShooter.getBoundingClientRect()
         let myShipRect = myShip.getBoundingClientRect()
         if (!(myShooterRect.left <= myShipRect.right && myShooterRect.right >= myShipRect.left) || ((myShooterRect.left <= myShipRect.right && myShooterRect.right >= myShipRect.left) && !shipMoving)) {
-        left += direction * 2;
-        shooterCollisionCooldown = true
-            setTimeout(() => {
-                shooterCollisionCooldown = false
-            }, 400)
+            left += direction * 2;
         if (left + shooterWidth >= gameWidth || left <= 0) {
             direction *= (-1);
         }
         myShooter.style.transform = `translateX(${left}px)`;
-        } else if (shipMoving) {
+        } else if (shipMoving && !shooterCollisionCooldown) {
             direction *= (-1);
             left += direction * 2;
+            shooterCollisionCooldown = true
+            setTimeout(() => {
+                shooterCollisionCooldown = false
+            }, 400)
         if (left + shooterWidth >= gameWidth || left <= 0) {
             direction *= (-1);
         }
@@ -462,10 +496,10 @@
     let movingLeft = false;
 
     document.addEventListener("keydown", (event) => {
-        if (!collisionShown && event.key === "ArrowLeft") {
+        if (event.key === "ArrowLeft") {
             movingLeft = true;
             shipMoving = true;
-        } else if (!collisionShown && event.key === "ArrowRight") {
+        } else if (event.key === "ArrowRight") {
             movingRight = true;
             shipMoving = true;
         }
@@ -481,45 +515,28 @@
     })
 
     const myShipWidth = myShip.offsetWidth;
-    // let startPosition = 0 + gameWidth / 2;
     let leftMostPosition = 0 + myShipWidth/2;
     let myShipLeft = 0 + gameWidth / 2;
 
     function moveShip() {
-        // myShip.style.transform = `translateX(${myShipLeft}px)`
-        // let left = parseInt(myShip.style.left || startPosition,10)
         let myShooterRect = myShooter.getBoundingClientRect()
         let myShipRect = myShip.getBoundingClientRect()
         let buffer = myShipWidth/2 - 5
-        let isOverlapping = !(myShooterRect.left - buffer >= myShipRect.right || myShooterRect.right <= myShipRect.left - buffer);
-        if (isOverlapping && !collisionShown && shipMoving && !shooterRemoved && shootingBullets) {
-            let alertCollision =  document.createElement("div")
-            alertCollision.classList.add("alerts")
-            alertCollision.textContent = "⚠ Collision imminent!"
-            alertCollision.style.position = "absolute"
-            alertCollision.style.left = "50%"
-            alertCollision.style.bottom = "30vh"
-            alertCollision.style.transform = "translate(-50%, -50%)"
-            alertCollision.style.color = "red"
-            alertCollision.style.fontSize = "1em";
-            alertCollision.style.zIndex = "940"
-            game.appendChild(alertCollision)
+        let shooterOverlapping = !(myShooterRect.left - buffer >= myShipRect.right || myShooterRect.right <= myShipRect.left - buffer);
+        if (shooterOverlapping && !collisionShown && shipMoving && !shooterRemoved && shootingBullets) {
+            alertCollision.style.display = "block"
             collisionShown = true
             setTimeout(() => {
-                alertCollision.remove()
+                alertCollision.style.display = "none"
                 collisionShown = false;
             }, 1000)
         }
-        // if (!collisionShown) {
         if (movingLeft) {
             myShipLeft -= 4;
         } else if (movingRight) {
             myShipLeft += 4;
         } 
-            
-        // }
         myShipLeft = Math.max(leftMostPosition, Math.min(myShipLeft, gameWidth - myShipWidth / 2))
-        // myShip.style.left = left + 'px';
         myShip.style.transform = `translateX(${myShipLeft}px)`
     }
 
@@ -614,10 +631,10 @@
                 }
             }
             if (isOverlapping(bullet, myShooter)) {
+                if (shooterLives <= 0 ) {
                 let myShooterLocation = myShooter.getBoundingClientRect()
                 shooterRemoved = true
                 myShooter.style.display = "none"
-                // myShooter.remove()
                 score -= 20
                 let expl = document.createElement("img")
                 expl.src = "images/explosion.png"
@@ -627,6 +644,9 @@
                 expl.style.left = myShooterLocation.left -gameLeft + "px";
                 expl.style.animation = "fadeOut 3s forwards"
                 game.appendChild(expl)
+                } else {
+                    shooterLives -= 2
+                }
             } else if (!(bulletLeft > asteroid1Left && bulletLeft < asteroid1Right) && !(bulletLeft > asteroid2Left && bulletLeft < asteroid2Right) && !(bulletLeft > asteroid3Left && bulletLeft < asteroid3Right) && !(bulletLeft > asteroid4Left && bulletLeft < asteroid4Right)) {
                 if (bulletBottomNum + bulletHeight + 5 < gameHeight) {
                     bulletBottomNum += 10;

@@ -33,22 +33,38 @@
 
 #popup {
   position: absolute;
-  top: 5%;
+  top: 7%;
   left: 5%;
   transform: translate(-50%, -50%);
   background: transparent;
   padding: 5px;
-  border: 2px solid magenta;
-  border-radius: 10px;
   z-index: 990;
   text-align: center;
   color: rgb(72, 3, 72);
 }
 
-#popup button {
+.popup-buttons {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px; 
+}
+
+#button {
+  border: 2px solid magenta;
+  border-radius: 10px;
   display: block;
   margin: 10px auto;
-  padding: 2px 2px;
+  padding: 4px 4px;
+  font-size: 1.2em;
+}
+
+#continueBtn {
+  border: 2px solid magenta;
+  border-radius: 10px;
+  display: block;
+  margin: 10px auto;
+  padding: 4px 4px;
   font-size: 1.2em;
 }
 
