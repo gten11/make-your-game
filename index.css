@@ -18,17 +18,38 @@
     color: magenta;
 }
 
+
 #hud {
-  position: fixed;   
+  position: absolute;   
   top: 2vh;
   right: 5vw;
   color: rgb(58, 12, 64);
   font-size: 1em;
   text-align: right;
-  z-index: 10000;
+  z-index: 910;
+  pointer-events: none; 
   white-space: pre-line;
 }
 
+#popup {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  padding: 5px;
+  border: 2px solid magenta;
+  border-radius: 10px;
+  z-index: 990;
+  text-align: center;
+  color: rgb(72, 3, 72);
+}
+#popup button {
+  display: block;
+  margin: 10px auto;
+  padding: 2px 2px;
+  font-size: 1.2em;
+}
 
 #alertGameOver {
     white-space: pre-line; 
@@ -38,7 +59,7 @@
     transform: translate(-50%, -50%);
     color: red;
     font-size: 5em;
-    z-index: 9999;
+    z-index: 920;
     text-align: center;
 }
 

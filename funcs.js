@@ -5,6 +5,7 @@
 
     let stopGame = true
     let gameOver = false
+    let restarted = false
     let lives = 4
     let score = 0
     let alienWaves = 3
@@ -49,6 +50,58 @@
         hud.textContent = `Total score ${score}\nTotal lives: ${lives}`
     }
 
+    let popup = document.createElement("div")
+    popup.id = "popup"
+    // popup.style.display = "none"
+    game.appendChild(popup)
+
+    let restartBtn = document.createElement("div")
+    restartBtn.id = "button"
+    restartBtn.textContent = "Restart"
+    restartBtn.addEventListener("click", () => {
+        restart()
+    })
+    popup.appendChild(restartBtn)
+
+    function restart() {
+        stopGame = true
+        gameOver = false
+        shipMoving = false
+        shooterRemoved = false
+        collisionShown = false
+        lives = 4
+        score = 0
+        alienWaves = 3
+        document.querySelectorAll(".aliens, .alienBullets, .shipBullets, .myBullets, .alerts").forEach(el => el.remove())
+        aliens = []
+        countAliens = 28
+        totalAliens = 0
+        alienId = 1
+        aliensMap = new Map()
+        aliensOffset = 0
+        aliensDirection = 1
+        alienBullets = []
+        bulletsMap = new Map()
+        countBullet = 0
+        alertLifeShown = false
+        bullets = []
+        left = 0;
+        direction = 1;
+        shooterCollisionCooldown = false
+        bottom = 0;
+        movingRight = false;
+        movingLeft = false;
+        startPosition = 0 + gameWidth / 2;
+        leftMostPosition = 0 + myShipWidth/2;
+        shipBullets = []
+        shootingBullets = false
+        restarted = true
+        myShip.style.display = "block"
+        myShooter.style.display = "block"
+        updateHud()
+        resetIntro()
+    }
+
         //obj1 must be smaller than obj2
     function isOverlapping(obj1, obj2) {
         obj1Rect = obj1.getBoundingClientRect()
@@ -60,23 +113,28 @@
         return false
     }
 
+    function resetIntro() {
+  const gameName = document.getElementById("gameName");
+  const instr = document.getElementById("instructionStart");
+  gameName.style.animation = "none";
+  instr.style.animation = "none";
+  void gameName.offsetWidth;
+  void instr.offsetWidth;
+  gameName.style.animation = "";
+  instr.style.animation = "";
+}
+
+
     function startGame() {
         const gameName = document.getElementById("gameName")
         const instr = document.getElementById("instructionStart")
         gameName.style.animation = "fadeOut 3s forwards"
         instr.style.animation = "fadeOut 3s forwards"
-        stopgame = false
         gameStarted = true
+        shooterRemoved = false
         sendAliens()
         gameLoop()
     }
-
-    document.addEventListener("keydown", (event) => {
-        if (event.key === " ") {
-            startGame()
-            
-        }
-    })
 
     function vwToPx(vw) {
         return (vw / 100) * window.innerWidth;
@@ -101,12 +159,14 @@
     let aliensMap = new Map()
 
     function sendAliens() {
-        if (alienWaves > 0 && totalAliens === 0) {
+        console.log("sending aliens func started")
+        if (alienWaves > 0 && totalAliens === 0 && !stopGame) {
             alienWaves--
 
    const alienInterval = setInterval(() => {
-        if (gameStarted && countAliens > totalAliens) {
+        if (gameStarted && !stopGame && countAliens > totalAliens) {
             let alien = document.createElement("img")
+            alien.classList.add("aliens")
             alien.style.position = "absolute"
             switch (true) {
                 case (totalAliens < 7) :
@@ -140,13 +200,14 @@
         aliens.push(alien)
         totalAliens++
         alienId++
-        } else if (countAliens === totalAliens) {
+        } else if (countAliens === totalAliens || restarted) {
         clearInterval(alienInterval)
         }
         }, 200)
-        } else {
+        } else if (totalAliens === 0 && alienWaves === 0 && !stopGame) {
             stopGame = true
             let alertGameOver =  document.createElement("div")
+            alertGameOver.classList.add("alerts")
             alertGameOver.id = "alertGameOver"
             alertGameOver.textContent = `YOU WON\nTotal score is ${score}`;
             gameOver = true
@@ -158,6 +219,7 @@
     let aliensDirection = 1
 
     function moveAliens() {
+        console.log("aliens move")
 
         let alienWidth = vwToPx(3)
         let maxRight = Math.max(...aliens.map(a => parseFloat(a.dataset.baseLeft) + aliensOffset + alienWidth))
@@ -182,6 +244,7 @@
         let alienRect = aliens[i].getBoundingClientRect()
         let alienWidth = alienRect.width
         const alienBullet = document.createElement("img")
+        alienBullet.classList.add("alienBullets")
         alienBullet.id = name
         alienBullet.src = "images/bullet.png"
         alienBullet.style.width = "0.5vw";
@@ -217,6 +280,7 @@
                 if (lives === 0) {
                 stopGame = true
                 let alertGameOver =  document.createElement("div")
+                alertGameOver.classList.add("alerts")
                 alertGameOver.id = "alertGameOver"
                 alertGameOver.textContent = `GAME OVER\nTotal score is ${score}`
                 gameOver = true
@@ -228,7 +292,8 @@
                 explShip.style.width = "3vw";
                 explShip.style.left = myShipLocation.left -gameLeft + "px";
                 explShip.style.animation = "fadeOut 3s forwards"
-                myShip.remove()
+                myShip.style.display = "none"
+                // myShip.remove()
                 game.appendChild(explShip)
                 } else {
                     let id = bullet.id.slice(11)
@@ -245,7 +310,7 @@
                     alertLife.style.transform = "translate(-50%, -50%)"
                     alertLife.style.color = "red"
                     alertLife.style.fontSize = "2em";
-                    alertLife.style.zIndex = "9998"
+                    alertLife.style.zIndex = "930"
                     game.appendChild(alertLife)
                     alertLifeShown = true
                     setTimeout(() => {
@@ -311,6 +376,7 @@
         countBullet++
         let name = "myBullet" + countBullet;
         const myBullet = document.createElement("img")
+        myBullet.classList.add("myBullets")
         myBullet.id = name
         myBullet.src = "images/bulletMine.png"
         myBullet.style.width = "0.5vw";
@@ -404,6 +470,7 @@
         let isOverlapping = !(myShooterRect.left - buffer >= myShipRect.right || myShooterRect.right <= myShipRect.left - buffer);
         if (isOverlapping && !collisionShown && shipMoving && !shooterRemoved && shootingBullets) {
             let alertCollision =  document.createElement("div")
+            alertCollision.classList.add("alerts")
             alertCollision.textContent = "⚠ Collision imminent!"
             alertCollision.style.position = "absolute"
             alertCollision.style.left = "50%"
@@ -411,7 +478,7 @@
             alertCollision.style.transform = "translate(-50%, -50%)"
             alertCollision.style.color = "red"
             alertCollision.style.fontSize = "1em";
-            alertCollision.style.zIndex = "9997"
+            alertCollision.style.zIndex = "940"
             game.appendChild(alertCollision)
             collisionShown = true
             setTimeout(() => {
@@ -440,9 +507,14 @@
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "s") {
-            if (!intervalId) {
+            if (!intervalId && !restarted && !stopGame) {
             createBullets()
             intervalId = setInterval(createBullets, 200)
+            } else if (restarted) {
+                clearInterval(intervalId)
+                intervalId = null;
+                shootingBullets = false;
+                createBullets()
             }
             if (!shootingBullets) {
             shootBullet()
@@ -467,6 +539,7 @@
         let shipHeight = shipRect.height;
         const bulletStart = shipLeft + shipRect.width/2 - gameLeft - vwToPx(shipBulletWidth)/2;
         const shipBullet = document.createElement("img")
+        shipBullet.classList.add("shipBullets")
         shipBullet.src = "images/fire.png"
         shipBullet.style.width = "0.5vw";
         const bottomBullet = 0.5 + pxToVh(shipHeight); 
@@ -518,7 +591,8 @@
             if (isOverlapping(bullet, myShooter)) {
                 let myShooterLocation = myShooter.getBoundingClientRect()
                 shooterRemoved = true
-                myShooter.remove()
+                myShooter.style.display = "none"
+                // myShooter.remove()
                 score -= 20
                 let expl = document.createElement("img")
                 expl.src = "images/explosion.png"
@@ -549,6 +623,7 @@
     }
 
      function gameLoop() {
+        console.log("game loop started", "stopGame", stopGame)
         if (stopGame) {
             return
         }
@@ -574,7 +649,7 @@
         if (event.key === " " && !gameOver) {
             stopGame = !stopGame;
             if (!stopGame) {
-            gameLoop()
+            startGame()
         }
         }
     })
