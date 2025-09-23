@@ -12,6 +12,7 @@
     let alienWaves = 3
     let game = document.getElementById("game")
     let myShooter = document.getElementById("myShooter")
+    let myShip = document.getElementById("myShip")
     let asteroid1 = document.getElementById("asteroid1")
     let asteroid2 = document.getElementById("asteroid2")
     let asteroid3= document.getElementById("asteroid3")
@@ -36,7 +37,6 @@
     let asteroid3Top = asteroidWhere3.bottom - asteroidWhere3.height
     let asteroid4Top = asteroidWhere4.bottom - asteroidWhere4.height
     let gameWidth = document.getElementById("game").offsetWidth;
-    const myShip = document.getElementById("myShip")
     let shooterHeight = document.getElementById("myShooter")?.offsetHeight || 26;
     let collisionShown = false
     let shipMoving = false
@@ -66,7 +66,6 @@
 
     let popup = document.createElement("div")
     popup.id = "popup"
-    // popup.style.display = "none"
     game.appendChild(popup)
 
     let restartBtn = document.createElement("div")
