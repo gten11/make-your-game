@@ -6,6 +6,7 @@
     let stopGame = true
     let gameOver = false
     let restarted = false
+    let shooterLives = 10
     let lives = 4
     let score = 0
     let alienWaves = 3
@@ -47,7 +48,7 @@
     game.appendChild(hud)
 
     function updateHud() {
-        hud.textContent = `Total score ${score}\nTotal lives: ${lives}`
+        hud.textContent = `Total score ${score}\nAlien waves remain: ${alienWaves}\nTotal lives: ${lives}\nShooter lives ${shooterLives}`
     }
 
     let popup = document.createElement("div")
@@ -69,6 +70,7 @@
         shipMoving = false
         shooterRemoved = false
         collisionShown = false
+        shooterLives = 10
         lives = 4
         score = 0
         alienWaves = 3
@@ -96,6 +98,7 @@
         shipBullets = []
         shootingBullets = false
         restarted = true
+        myShipLeft = 0 + gameWidth / 2;
         myShip.style.display = "block"
         myShooter.style.display = "block"
         updateHud()
@@ -159,7 +162,6 @@
     let aliensMap = new Map()
 
     function sendAliens() {
-        console.log("sending aliens func started")
         if (alienWaves > 0 && totalAliens === 0 && !stopGame) {
             alienWaves--
 
@@ -217,14 +219,14 @@
 
     let aliensOffset = 0
     let aliensDirection = 1
+    let alienWidth = vwToPx(3)
 
     function moveAliens() {
-        console.log("aliens move")
-
-        let alienWidth = vwToPx(3)
+        // let aliveAliens = aliens.filter(a => a.isConnected);
+        // if (aliveAliens.length === 0) return;
         let maxRight = Math.max(...aliens.map(a => parseFloat(a.dataset.baseLeft) + aliensOffset + alienWidth))
         let minLeft = Math.min(...aliens.map(a => parseFloat(a.dataset.baseLeft) + aliensOffset))
-            if (maxRight >= gameWhere.width || minLeft <= 5) {
+            if (maxRight >= gameWhere.width - 10|| minLeft <= 10) {
             aliensDirection *= (-1)
             }
             aliensOffset += aliensDirection * 2;
@@ -318,6 +320,29 @@
                     alertLifeShown = false;
             }, 1000)
                 }
+            } 
+            if (isOverlapping(bullet, myShooter)) {
+                let id = bullet.id.slice(11)
+                bullet.remove()
+                alienBullets = alienBullets.filter(b =>  b != bullet)
+                bulletsMap.delete(id)
+                let myShooterLocation = myShooter.getBoundingClientRect()
+                if (shooterLives === 0) {
+                shooterRemoved = true
+                myShooter.style.display = "none"
+                score -= 20
+                let expl = document.createElement("img")
+                expl.src = "images/explosion.png"
+                expl.style.position = "absolute";
+                expl.style.bottom = "19vh";
+                expl.style.width = "5vw";
+                expl.style.left = myShooterLocation.left -gameLeft + "px";
+                expl.style.animation = "fadeOut 3s forwards"
+                game.appendChild(expl)
+                } else {
+                    shooterLives--
+                    score -= 2
+                }
             }
             let bulletRect = bullet.getBoundingClientRect()
             let bulletLeft = bulletRect.left
@@ -388,7 +413,6 @@
         myBullet.style.transform = `translateY(${0}vh)`
         myBullet.dataset.bottom = bottom;
         myBullet.dataset.offset = 0;
-        // myBullet.style.bottom =  19 + pxToVh(shooterHeight) + "vh";
         game.appendChild(myBullet);
         bullets.push(myBullet)
     }
@@ -408,6 +432,7 @@
                 aliensMap.set(alienIdStr, false)
                 bulletsMap.delete(alienId)
                 alienBullets.filter(b => b.id != "alienBullet" + alienId)
+                aliens.filter(a => a != alien)
                 alien.remove()
                 score += 10
                 totalAliens--
@@ -415,7 +440,6 @@
                     sendAliens()
                 }
                 score += 10
-                aliens.filter(a => a != alien)
                 let expl = document.createElement("img")
                 expl.src = "images/explosion.png"
                 expl.style.position = "absolute";
@@ -430,7 +454,6 @@
                 bullet.remove()
             } else {
             bullet.style.transform = `translateY(${offset}vh)`
-            // bullet.style.bottom = bottom + 'vh';
             }
         }
     }
@@ -458,12 +481,13 @@
     })
 
     const myShipWidth = myShip.offsetWidth;
-    let startPosition = 0 + gameWidth / 2;
+    // let startPosition = 0 + gameWidth / 2;
     let leftMostPosition = 0 + myShipWidth/2;
-  
+    let myShipLeft = 0 + gameWidth / 2;
 
     function moveShip() {
-        let left = parseInt(myShip.style.left || startPosition,10)
+        // myShip.style.transform = `translateX(${myShipLeft}px)`
+        // let left = parseInt(myShip.style.left || startPosition,10)
         let myShooterRect = myShooter.getBoundingClientRect()
         let myShipRect = myShip.getBoundingClientRect()
         let buffer = myShipWidth/2 - 5
@@ -488,14 +512,15 @@
         }
         // if (!collisionShown) {
         if (movingLeft) {
-            left -= 4;
+            myShipLeft -= 4;
         } else if (movingRight) {
-            left += 4;
+            myShipLeft += 4;
         } 
             
         // }
-        left = Math.max(leftMostPosition, Math.min(left, gameWidth - myShipWidth / 2))
-        myShip.style.left = left + 'px';
+        myShipLeft = Math.max(leftMostPosition, Math.min(myShipLeft, gameWidth - myShipWidth / 2))
+        // myShip.style.left = left + 'px';
+        myShip.style.transform = `translateX(${myShipLeft}px)`
     }
 
     moveShip()

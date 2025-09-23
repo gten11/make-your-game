@@ -44,6 +44,7 @@
   text-align: center;
   color: rgb(72, 3, 72);
 }
+
 #popup button {
   display: block;
   margin: 10px auto;
@@ -83,12 +84,12 @@
 }
 
 #myShip {
-    object-fit: contain;   /* ensures it scales without distortion */
+    object-fit: contain;   
     object-position: center;
     width: 7vw;
     bottom: 0.5vh;
-    left: 50%;
-    transform: translateX(-50%);
+    /* left: 50%;
+    transform: translateX(-50%); */
     position: absolute;
 }
 
