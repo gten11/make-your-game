@@ -56,12 +56,49 @@
     alertCollision.style.display = "none"
     game.appendChild(alertCollision)
 
+    let timerDuration = 60; 
+    let timerRemaining = timerDuration;
+    let lastTime = performance.now();
+
+function startTimer() {
+  timerRemaining = timerDuration;
+  lastTime = performance.now();
+}
+
+function updateTimer(now) {
+   if (lastTime === undefined) lastTime = now;
+    const delta = (now - lastTime) / 1000;
+    lastTime = now;
+    timerRemaining -= delta;
+    if (timerRemaining <= 0) {
+        timerRemaining = 0;
+        if (lives > 0 ) {
+            let alertGameOver =  document.createElement("div")
+            alertGameOver.classList.add("alerts")
+            alertGameOver.style.display = "block"
+            alertGameOver.id = "alertGameOver"
+            alertGameOver.textContent = `YOU WON\nTotal score is ${score}`;
+            gameOver = true
+            game.appendChild(alertGameOver)
+        } else {
+            let alertGameOver =  document.createElement("div")
+            alertGameOver.classList.add("alerts")
+            alertGameOver.style.display = "block"
+            alertGameOver.id = "alertGameOver"
+            alertGameOver.textContent = `GAME OVER\nTotal score is ${score}`;
+            gameOver = true
+            game.appendChild(alertGameOver)
+        }
+        stopGame = true;
+    }
+}
+
     let hud = document.createElement("div")
     hud.id = "hud"
     game.appendChild(hud)
 
     function updateHud() {
-        hud.textContent = `Total score ${score}\nAlien waves remain: ${alienWaves}\nTotal lives: ${lives}\nShooter lives ${Math.max(shooterLives,0)}`
+        hud.textContent = `Total score ${score}\nAlien waves remain: ${alienWaves}\nTotal lives: ${lives}\nShooter lives ${Math.max(shooterLives,0)}\nTime: ${Math.ceil(timerRemaining)}`
     }
 
     let popup = document.createElement("div")
@@ -165,8 +202,11 @@
         gameName.style.animation = "fadeOut 3s forwards"
         instr.style.animation = "fadeOut 3s forwards"
         gameStarted = true
+        timerRemaining = timerDuration; 
+        lastTime = performance.now()
+        startTimer()
         sendAliens()
-        gameLoop()
+        requestAnimationFrame(gameLoop)
     }
 
     function vwToPx(vw) {
@@ -665,11 +705,12 @@
         }
     }
 
-     function gameLoop() {
+     function gameLoop(now) {
         console.log("game loop started", "stopGame", stopGame)
         if (stopGame) {
             return
         }
+        updateTimer(now);
         moveShip()
         moveAliens()
         createAlienBullets()
