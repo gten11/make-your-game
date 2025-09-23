@@ -87,6 +87,8 @@
     transform: translate(-50%, -50%);
     font-size: 2rem;
     color: rgb(37, 25, 72);
+    white-space: pre-line;
+    text-align: center;
 }
 
 @keyframes fadeOut {
@@ -104,8 +106,6 @@
     object-position: center;
     width: 7vw;
     bottom: 0.5vh;
-    /* left: 50%;
-    transform: translateX(-50%); */
     position: absolute;
 }
 

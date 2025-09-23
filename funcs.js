@@ -472,7 +472,6 @@
                 if (totalAliens === 0) {
                     sendAliens()
                 }
-                score += 10
                 let expl = document.createElement("img")
                 expl.src = "images/explosion.png"
                 expl.style.position = "absolute";
