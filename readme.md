@@ -4,6 +4,7 @@ A simple browser-based arcade game where you control a ship and fight waves of a
 Alien Waves: The game starts with 3 waves of aliens.
 Ship Lives: You begin with 4 lives.
 Shooter Lives: Your shooter starts with 10 lives.
+Your countdown timer start with 60. When it is up, game is over.
 ## Scoring System
 +10 points → when you destroy an alien.
 -30 points → when your ship is hit by an alien.
