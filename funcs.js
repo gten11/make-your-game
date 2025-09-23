@@ -84,10 +84,10 @@
     continueBtn.addEventListener("click", () => {
         if (!stopGame) {
         stopGame = true
-        continueBtn.textContent = "Pause"
+        continueBtn.textContent = "Continue"
         } else {
         stopGame = false
-        continueBtn.textContent = "Continue"
+        continueBtn.textContent = "Pause"
         startGame()
         }
     })
@@ -692,7 +692,10 @@
         if (event.key === " " && !gameOver) {
             stopGame = !stopGame;
             if (!stopGame) {
+            continueBtn.textContent = "Pause"
             startGame()
+        } else {
+            continueBtn.textContent = "Continue"
         }
         }
     })
