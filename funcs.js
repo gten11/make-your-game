@@ -377,8 +377,8 @@ function updateTimer(now) {
                     alienBullets = alienBullets.filter(b =>  b != bullet)
                     bulletsMap.delete(id)
                     let alertLife =  document.createElement("div")
-                    alertLife.textContent = "⚠ Life lost! " + `${lives}` + " lives remain"
                     lives--
+                    alertLife.textContent = "⚠ Life lost! " + `${lives}` + " lives remain"
                     score -= 30
                     alertLife.style.position = "absolute"
                     alertLife.style.left = "50%"
