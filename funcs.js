@@ -600,7 +600,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let myShipLeft = gameWidth / 2;
 
   function moveShip() {
-    console.log("myshipleft", myShipLeft);
     let myShooterRect = myShooter.getBoundingClientRect();
     let myShipRect = myShip.getBoundingClientRect();
     let buffer = myShipWidth / 2 - 5;
@@ -770,7 +769,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function gameLoop(now) {
-    console.log("game loop started", "stopGame", stopGame);
     if (stopGame) {
       return;
     }
