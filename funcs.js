@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   let stopGame = true;
+  let lastTime = null
+  let firstStart = true
   let gameOver = false;
   let restarted = false;
   let shooterLives = 10;
@@ -54,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let timerDuration = 60;
   let timerRemaining = timerDuration;
-  let lastTime = performance.now();
+  // let lastTime = performance.now();
 
   function startTimer() {
     timerRemaining = timerDuration;
@@ -119,11 +121,13 @@ document.addEventListener("DOMContentLoaded", () => {
   continueBtn.textContent = "Pause";
   continueBtn.addEventListener("click", () => {
     if (!stopGame) {
+      timerRemaining
       stopGame = true;
       continueBtn.textContent = "Continue";
     } else {
       stopGame = false;
       continueBtn.textContent = "Pause";
+      lastTime = performance.now();
       startGame();
     }
   });
@@ -131,6 +135,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function restart() {
     stopGame = true;
+    lastTime = null;
+    timerRemaining = timerDuration
     gameOver = false;
     shipMoving = false;
     shooterRemoved = false;
@@ -209,9 +215,12 @@ document.addEventListener("DOMContentLoaded", () => {
     gameName.style.animation = "fadeOut 3s forwards";
     instr.style.animation = "fadeOut 3s forwards";
     gameStarted = true;
-    timerRemaining = timerDuration;
-    lastTime = performance.now();
-    startTimer();
+    if (firstStart) {
+      firstStart = false
+      timerRemaining = timerDuration;
+      lastTime = performance.now();
+      startTimer();
+    } 
     sendAliens();
     requestAnimationFrame(gameLoop);
   }
@@ -808,6 +817,7 @@ document.addEventListener("DOMContentLoaded", () => {
       stopGame = !stopGame;
       if (!stopGame) {
         continueBtn.textContent = "Pause";
+        lastTime = performance.now();
         startGame();
       } else {
         continueBtn.textContent = "Continue";
